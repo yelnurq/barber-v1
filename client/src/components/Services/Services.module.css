@@ -1,0 +1,62 @@
+.services {
+  padding: 4rem 2rem;
+  background: #111; /* тёмный фон */
+  color: #f5f5f5;
+  text-align: center;
+}
+
+.title {
+  font-size:1.8rem;
+  margin-bottom: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #e0a800;
+}
+.descBarber {
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 2rem;
+  font-weight: 200;
+  font-style: italic;
+  text-align: left;
+  line-height: 1.7;
+  color: #ddd;
+    padding-top: 0;
+  font-size: 2rem;
+}
+
+.descBarber p {
+    margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.list {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem 3rem; /* вертикальный и горизонтальный отступ */
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  padding: 0.8rem 0;
+}
+
+.name {
+  font-size: 1.2rem;
+  text-align: left;
+  flex: 1;
+}
+
+.price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #e0a800;
+  margin-left: 1rem;
+  white-space: nowrap;
+}

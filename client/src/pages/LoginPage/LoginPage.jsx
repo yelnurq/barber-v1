@@ -20,7 +20,7 @@ export default function Login() {
     setMessage('');
 
     try {
-      const response = await axiosInstance.post('/api/login', {
+      const response = await axiosInstance.post('/login', {
         phone,
         password
       });

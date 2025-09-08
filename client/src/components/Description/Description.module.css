@@ -1,0 +1,18 @@
+
+.descBarber {
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 2rem;
+  font-weight: 200;
+  font-style: italic;
+  text-align: left;
+  line-height: 1.7;
+  color: #ddd;
+    padding-top: 0;
+  font-size: 2rem;
+}
+
+.descBarber p {
+    margin-top: 0;
+  margin-bottom: 1.5rem;
+}

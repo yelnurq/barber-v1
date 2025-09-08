@@ -1,3 +1,15 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  overflow-x: hidden; /* убираем горизонтальный скролл */
+}
+
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -34,12 +46,13 @@ input[type=number] {
 
 body {
   margin: 0;
-  font-family: 'Manrope', sans-serif;
-  background-color: #f9f9f9;
+  padding: 0;
+  font-family: 'Oswald', sans-serif;
+  background-color: #0c0c0c;
 }
 
 button, a, textarea, input, select, label {
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Oswald', sans-serif;
 }
 
 h1, h2, h3 {
