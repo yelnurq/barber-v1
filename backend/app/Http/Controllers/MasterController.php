@@ -9,12 +9,15 @@ class MasterController extends Controller
 {
     public function index()
     {
-        return Master::all();
+        // Возвращаем только активных мастеров
+        return Master::where('is_active', true)->get();
     }
 
     public function store(Request $request)
     {
-        return Master::create($request->all());
+        $data = $request->all();
+        $data['is_active'] = true; // по умолчанию активный
+        return Master::create($data);
     }
 
     public function update(Request $request, Master $master)
@@ -25,8 +28,8 @@ class MasterController extends Controller
 
     public function destroy(Master $master)
     {
-        $master->delete();
+        // Вместо удаления делаем "скрытие"
+        $master->update(['is_active' => false]);
         return response()->noContent();
     }
 }
-

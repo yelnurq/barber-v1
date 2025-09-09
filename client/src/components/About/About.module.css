@@ -142,8 +142,9 @@
   display: flex;
   align-items: center;
   padding-bottom: 40px;
+  max-width: 1100px;
+  padding: 24px;
   justify-content: center;
-    max-width: 1100px;
 
 }
 
@@ -151,13 +152,11 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  width: 90%;
-  max-width: 1000px;
 }
 
 .slide {
   height: 260px;
-  border-radius: 12px;
+  border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0,0,0,0.12);
   transition: transform 0.3s;
@@ -194,11 +193,11 @@
 }
 
 .prev {
-  left: 10px;
+  left: -30px;
 }
 
 .next {
-  right: 10px;
+  right: -30px;
 }
 
 /* Адаптив */
@@ -213,3 +212,6 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+

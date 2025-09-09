@@ -3,6 +3,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styles from "./AppointmentsAdmin.module.css";
 import axiosInstance from "../../../api/axios";
+import AdminHeader from "../../../components/AdminHeader/AdminHeader";
 
 export default function AppointmentsAdmin() {
   const [date, setDate] = useState(new Date());
@@ -101,6 +102,7 @@ export default function AppointmentsAdmin() {
 
   return (
     <>
+    <AdminHeader/>
       <div className={styles.wrapper}>
         <div className={styles.calendarBox}>
           <Calendar value={date} onChange={setDate} />

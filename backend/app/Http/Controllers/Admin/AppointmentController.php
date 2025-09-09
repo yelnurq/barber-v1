@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
+use App\Models\Master;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -66,5 +67,74 @@ public function storeAdmin(Request $request)
 
     return $appointments;
 }
+  public function daily($date)
+    {
+        // Получаем всех активных мастеров
+        $masters = Master::where('is_active', true)->get();
 
+        $stats = $masters->map(function ($master) use ($date) {
+            // Все записи мастера за дату
+            $appointments = Appointment::where('master_id', $master->id)
+                ->whereDate('date_time', $date)
+                ->get();
+
+            $total = $appointments->sum(function ($a) {
+                return $a->service?->price ?? 0;
+            });
+
+            $confirmed = $appointments->where('status', 'confirmed')
+                ->sum(function ($a) {
+                    return $a->service?->price ?? 0;
+                });
+
+            return [
+                'master_id' => $master->id,
+                'master_name' => $master->name,
+                'total' => $total,
+                'confirmed' => $confirmed,
+            ];
+        });
+
+        return response()->json($stats);
+    }
+public function total()
+{
+    // Получаем все записи с сервисами
+    $total = \DB::table('appointments')
+        ->join('services', 'appointments.service_id', '=', 'services.id')
+        ->sum('services.price');
+
+    return response()->json(['total' => $total]);
+}
+
+
+    /**
+     * Получение статистики за период (по желанию)
+     */
+    public function period(Request $request)
+    {
+        $start = $request->query('start');
+        $end = $request->query('end');
+
+        $masters = Master::where('is_active', true)->get();
+
+        $stats = $masters->map(function ($master) use ($start, $end) {
+            $appointments = Appointment::where('master_id', $master->id)
+                ->whereBetween('date_time', [$start, $end])
+                ->get();
+
+            $total = $appointments->sum(fn($a) => $a->service?->price ?? 0);
+            $confirmed = $appointments->where('status', 'confirmed')
+                ->sum(fn($a) => $a->service?->price ?? 0);
+
+            return [
+                'master_id' => $master->id,
+                'master_name' => $master->name,
+                'total' => $total,
+                'confirmed' => $confirmed,
+            ];
+        });
+
+        return response()->json($stats);
+    }
 }

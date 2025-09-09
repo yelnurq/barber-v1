@@ -63,43 +63,65 @@ export default function BookingForm() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus(null);
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      await axiosInstance.post("/appointments", {
-        ...form,
-        date_time: `${form.date}T${form.time}`,
-      });
+  // Проверка: телефон должен быть 10 цифр после +7
+  if (!form.client_phone || form.client_phone.length !== 10) {
+    alert("Пожалуйста, заполните номер телефона полностью!");
+    return;
+  }
 
-      setStatus("success");
-      setForm({
-        client_name: "",
-        client_phone: "",
-        master_id: "",
-        service_id: "",
-        date: "",
-        time: "",
-      });
-      setCalendarDate(null);
-      setSlots([]);
-    } catch (err) {
-      setStatus("error");
-      console.error(err);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setStatus(null);
+
+  try {
+    await axiosInstance.post("/appointments", {
+      ...form,
+      date_time: `${form.date}T${form.time}`,
+    });
+
+    setStatus("success");
+    setForm({
+      client_name: "",
+      client_phone: "",
+      master_id: "",
+      service_id: "",
+      date: "",
+      time: "",
+    });
+    setCalendarDate(null);
+    setSlots([]);
+  } catch (err) {
+    setStatus("error");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const generateHours = () => {
+  const hours = [];
+  const now = new Date();
+  const selectedDate = new Date(form.date);
+
+  for (let h = 9; h <= 20; h++) {
+    let disabled = false;
+
+    // Если выбранная дата — сегодня
+    if (
+      selectedDate.toDateString() === now.toDateString() &&
+      h <= now.getHours() // блокируем прошедшие часы
+    ) {
+      disabled = true;
     }
-  };
 
-  const generateHours = () => {
-    const hours = [];
-    for (let h = 9; h <= 20; h++) {
-      hours.push(`${h.toString().padStart(2, "0")}:00`);
-    }
-    return hours;
-  };
+    hours.push({ hour: `${h.toString().padStart(2, "0")}:00`, disabled });
+  }
+
+  return hours;
+};
+
 
   return (
     <>
@@ -132,16 +154,18 @@ export default function BookingForm() {
           className={styles.input}
           required
         />
-        <IMaskInput
-          mask="+7 (000) 000-00-00"
-          type="tel"
-          name="client_phone"
-          placeholder="+7 (___) ___-__-__"
-          className={styles.input}
-          value={form.client_phone}
-          onAccept={(value) => setForm({ ...form, client_phone: value })}
-          required
-        />
+<IMaskInput
+  mask="+7 (000) 000-00-00"
+  type="tel"
+  name="client_phone"
+  placeholder="+7 (___) ___-__-__"
+  className={styles.input}
+  value={form.client_phone}
+  onAccept={(value, maskRef) =>
+    setForm({ ...form, client_phone: maskRef.unmaskedValue })
+  }
+  required
+/>
 
         <select
           name="service_id"
@@ -189,26 +213,27 @@ export default function BookingForm() {
           />
         )}
 
-        {form.date && (
-          <div className={styles.timeGrid}>
-            {generateHours().map((hour) => {
-              const isBooked = slots.includes(hour);
-              return (
-                <button
-                  key={hour}
-                  type="button"
-                  disabled={isBooked}
-                  className={`${styles.timeSlot} ${
-                    form.time === hour ? styles.active : ""
-                  }`}
-                  onClick={() => setForm({ ...form, time: hour })}
-                >
-                  {hour}
-                </button>
-              );
-            })}
-          </div>
-        )}
+{form.date && (
+  <div className={styles.timeGrid}>
+    {generateHours().map(({ hour, disabled }) => {
+      const isBooked = slots.includes(hour);
+      return (
+        <button
+          key={hour}
+          type="button"
+          disabled={isBooked || disabled} // блокируем если занято или уже прошло
+          className={`${styles.timeSlot} ${
+            form.time === hour ? styles.active : ""
+          }`}
+          onClick={() => setForm({ ...form, time: hour })}
+        >
+          {hour}
+        </button>
+      );
+    })}
+  </div>
+)}
+
 
         <button type="submit" className={styles.button} disabled={!form.time}>
           Записаться

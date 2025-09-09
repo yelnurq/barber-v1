@@ -27,6 +27,9 @@ Route::middleware(TokenCheck::class)->group(function () {
     Route::put('/admin/appointments/{id}', [App\Http\Controllers\Admin\AppointmentController::class, 'update']);
     Route::get('/admin/schedule/{date}', [AdminAppointmentController::class, 'day']);
 Route::post('/admin/appointments', [AdminAppointmentController::class, 'storeAdmin']);
+Route::get('/admin/statistics/{date}', [AdminAppointmentController::class, 'daily']);
+Route::get('/admin/statistics', [AdminAppointmentController::class, 'period']); // ?start=2025-09-01&end=2025-09-09
+Route::get('/admin/statistics-total', [AdminAppointmentController::class, 'total']);
 
     Route::delete('/admin/appointments/{id}', [\App\Http\Controllers\Admin\AppointmentController::class, 'destroy']);
 });

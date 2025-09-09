@@ -1,0 +1,33 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 3rem;
+  background: rgba(34, 34, 34, 0.4); /* затемнение */
+  color: #fff;
+  z-index: 9999;     /* 👈 всегда выше видео и контента */
+  backdrop-filter: blur(6px); /* 👈 стильное размытие */
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-family: "Epunda Slab";
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #ddd;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.nav a:hover {
+  color: #fff;
+}

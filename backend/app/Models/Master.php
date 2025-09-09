@@ -6,11 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Master extends Model
 {
-    protected $fillable = ['name', 'photo', 'specialization', 'schedule'];
+    protected $fillable = ['name', 'specialization', 'phone', 'is_active'];
 
-    protected $casts = [
-        'schedule' => 'array',
-    ];
 
     public function appointments()
     {

@@ -14,9 +14,9 @@ return new class extends Migration
 Schema::create('masters', function (Blueprint $table) {
     $table->id();
     $table->string('name');
-    $table->string('photo')->nullable();
+    $table->string('phone')->nullable();
     $table->string('specialization')->nullable();
-    $table->json('schedule')->nullable(); // пример: {"mon":["10:00-20:00"], "tue":[]}
+    $table->boolean('is_active')->default(true)->nullable();
     $table->timestamps();
 });
 

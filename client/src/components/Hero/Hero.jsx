@@ -26,7 +26,7 @@ export default function Hero() {
           Мы создаём не просто прическу, а ваш имидж. <br />
           Опытные мастера, премиальная атмосфера и внимание к деталям.
         </p>
-        <a href="tel:+77001234567" className={styles.button}>Позвонить</a>
+        <a href="tel:+77089793690" className={styles.button}>Позвонить</a>
         <button onClick={() => setOpen(true)} className={styles.button}>
           Записаться
         </button>

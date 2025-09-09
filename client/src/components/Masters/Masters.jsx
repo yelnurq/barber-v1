@@ -19,7 +19,7 @@ export default function Masters() {
 
   return (
     <section className={styles.masters}>
-      <h2 className={styles.title}>Наши мастера</h2>
+      <h2 className={styles.title}>Наши старшие мастера</h2>
       <div className={styles.grid}>
         {masters.map((m) => (
           <div key={m.id} className={styles.card}>

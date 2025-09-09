@@ -1,0 +1,141 @@
+/* src/pages/admin/EmployeesAdmin.module.css */
+.wrapper {
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 22px;
+  color: #111827;
+}
+
+.header button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.header button:hover {
+  background: #2563eb;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.table th, .table td {
+  padding: 12px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.table th {
+  background: #e2e8f0;
+  font-weight: 600;
+}
+
+.table tbody tr {
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.table tbody tr:hover {
+  transform: translateY(-2px);
+}
+
+.editBtn {
+  background: #facc15;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.editBtn:hover { background: #f59e0b; }
+
+.deleteBtn {
+  background: #ef4444;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover { background: #dc2626; }
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: #fff;
+  padding: 25px;
+  border-radius: 16px;
+  min-width: 360px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modalContent input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modalActions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modalActions button:first-child {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.modalActions button:first-child:hover {
+  background-color: #2563eb;
+}
+
+.modalActions button:last-child {
+  background-color: #e5e7eb;
+}
+
+.modalActions button:last-child:hover {
+  background-color: #d1d5db;
+}

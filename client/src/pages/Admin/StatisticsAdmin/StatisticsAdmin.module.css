@@ -1,0 +1,30 @@
+.wrapper {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: 'Inter', sans-serif;
+}
+
+.statsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.statsTable th, .statsTable td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 12px;
+}
+
+.statsTable th {
+  background: #1e293b;
+  color: #fff;
+}
+
+.totalRow td {
+  background: #f3f4f6;
+  font-weight: bold;
+}
