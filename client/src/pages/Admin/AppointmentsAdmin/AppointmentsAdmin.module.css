@@ -1,23 +1,25 @@
 .wrapper {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px;
+  padding: 24px;
   font-family: 'Inter', sans-serif;
-  background: #121212;
+  background: #f4f6fb;
   min-height: 100vh;
-  color: #e5e7eb;
-}
-
-.wrapper, .modal, .revenue {
-  font-family: 'Inter', sans-serif;
+  color: #111827;
 }
 
 .calendarBox {
-  flex: 0 0 280px;
-  background: #1f1f1f;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  flex: 0 0 300px;
+  background: #535f71;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+
+.calendarBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
 
 .schedule {
@@ -28,53 +30,53 @@
 .schedule table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0 12px;
 }
 
 .schedule th, .schedule td {
-  padding: 12px;
+  padding: 14px;
   text-align: center;
   font-size: 14px;
 }
 
 .schedule th {
-  background: #1e293b;
-  color: #f9fafb;
+  background: #1f2937;
+  color: #fff;
   font-weight: 600;
-  border-radius: 12px 12px 0 0;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .freeCard {
-  background: #1f1f1f;
-  border-radius: 12px;
-  padding: 10px;
+  background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+  border-radius: 16px;
+  padding: 12px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s;
-  color: #cbd5e1;
+  color: #374151;
+  transition: all 0.25s;
 }
 
 .freeCard:hover {
-  background: #374151;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .busyCard {
-  background: #2a1f1f;
+  background: linear-gradient(135deg, #fff5f5, #ffeaea);
   border-left: 4px solid #ef4444;
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 16px;
+  padding: 12px;
   font-size: 14px;
   line-height: 1.4;
   cursor: pointer;
-  transition: all 0.2s;
-  color: #f3f4f6;
+  transition: all 0.25s;
+  color: #111827;
 }
 
 .busyCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .appCard {
@@ -86,12 +88,12 @@
 .clientName {
   font-weight: 600;
   font-size: 15px;
-  color: #f9fafb;
+  color: #111827;
 }
 
 .serviceInfo {
   font-size: 13px;
-  color: #cbd5e1;
+  color: #4b5563;
 }
 
 .phone a {
@@ -106,13 +108,14 @@
 
 .status {
   margin-top: 6px;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 13px;
   color: #fff;
   font-weight: 500;
   display: inline-block;
-  transition: all 0.2s;
+  transition: all 0.25s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .booked { background-color: #facc15; color: #000; }
@@ -120,41 +123,44 @@
 .cancelled { background-color: #ef4444; }
 
 .revenue {
-  margin-top: 30px;
-  background: #1f1f1f;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: all 0.2s;
+}
+
+.revenue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
 }
 
 .revenueTable {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 8px;
+  border-spacing: 0 12px;
 }
 
 .revenueTable th, .revenueTable td {
-  padding: 10px 12px;
+  padding: 12px 14px;
   font-size: 14px;
   text-align: center;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .revenueTable th {
-  background: #374151;
+  background: #e2e8f0;
   font-weight: 600;
-  color: #f9fafb;
 }
 
 .totalRow td {
-  background: #b91c1c33;
+  background: #fef3c7;
   font-weight: bold;
 }
 
 .modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,13 +174,13 @@
 }
 
 .modalContent {
-  background: #1f1f1f;
-  padding: 25px;
-  border-radius: 16px;
-  min-width: 340px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  background: #fff;
+  padding: 28px;
+  border-radius: 20px;
+  min-width: 360px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.1);
   animation: slideIn 0.2s;
-  color: #e5e7eb;
+  color: #111827;
 }
 
 @keyframes slideIn {
@@ -185,35 +191,36 @@
 .modalContent input,
 .modalContent select {
   width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-  border: 1px solid #374151;
-  border-radius: 8px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   font-size: 14px;
-  background: #111827;
-  color: #f9fafb;
+  background: #f9fafb;
+  color: #111827;
+  transition: all 0.2s;
 }
 
 .modalContent input:focus,
 .modalContent select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
 .modalActions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 14px;
 }
 
 .modalActions button {
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.25s;
 }
 
 .modalActions button:first-child {
@@ -226,10 +233,10 @@
 }
 
 .modalActions button:last-child {
-  background-color: #374151;
-  color: #f9fafb;
+  background-color: #e5e7eb;
+  color: #111827;
 }
 
 .modalActions button:last-child:hover {
-  background-color: #1f2937;
+  background-color: #d1d5db;
 }

@@ -31,7 +31,7 @@ export default function Login() {
         localStorage.setItem('token', userToken);
         setMessage('✅ Успешный вход!');
         setTimeout(() => {
-          navigate('/admin/dashboard'); 
+          navigate('/admin'); 
         }, 1000);
       } else {
         setMessage('❌ Неизвестная ошибка.');
