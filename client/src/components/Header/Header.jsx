@@ -7,8 +7,7 @@ export default function Header() {
       <nav className={styles.nav}>
         <a href="#booking">Запись</a>
         <a href="#services">Услуги</a>
-        <a href="#masters">Мастера</a>
-        <a href="#reviews">Отзывы</a>
+        <a href="#gallery">Галерея</a>
         <a href="#contacts">Контакты</a>
       </nav>
     </header>

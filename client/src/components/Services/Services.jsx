@@ -14,7 +14,7 @@ export default function Services() {
   }, []);
 
   return (
-    <section className={styles.services}>
+    <section className={styles.services} id="services"> 
 
       <h2 className={styles.title}>Наши услуги</h2>
       <div className={styles.list}>

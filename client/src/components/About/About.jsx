@@ -28,7 +28,7 @@ export default function About() {
     ];
 
     return (
-        <section className={styles.about}>
+        <section className={styles.about} id="gallery">
                 <h2>Наша галерея</h2>
             <div className={styles.container}>
 

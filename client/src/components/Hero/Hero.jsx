@@ -7,7 +7,7 @@ export default function Hero() {
   const [open, setOpen] = useState(false);
 
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} id="booking">
       <video
         src="./video/video.mp4"
         className={styles.video}

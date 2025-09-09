@@ -3,7 +3,7 @@ import styles from "./Address.module.css";
 
 export default function Address() {
   return (
-    <section className={styles.address}>
+    <section className={styles.address} id="contacts">
         <div className={styles.container}>
                 <h2>Наш адрес</h2>
 
