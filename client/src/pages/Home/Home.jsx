@@ -8,6 +8,7 @@ import Description from "../../components/Description/Description";
 import MapIframe from "../../components/MapIframe/MapIframe";
 import Footer from "../../components/Footer/Footer";
 import Address from "../../components/Address/Address";
+import About from "../../components/About/About";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
         <Hero/>
         <Services />
         <Description/>
+        <About/>
       {/* <BookingForm /> */}
       {/* <Masters /> */}
       {/* <Reviews /> */}

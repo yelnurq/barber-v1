@@ -29,3 +29,4 @@ class MasterController extends Controller
         return response()->noContent();
     }
 }
+

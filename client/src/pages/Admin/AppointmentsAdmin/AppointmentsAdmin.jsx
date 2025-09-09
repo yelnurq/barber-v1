@@ -1,0 +1,293 @@
+import { useState, useEffect } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import styles from "./AppointmentsAdmin.module.css";
+import axiosInstance from "../../../api/axios";
+
+export default function AppointmentsAdmin() {
+  const [date, setDate] = useState(new Date());
+  const [appointments, setAppointments] = useState([]);
+  const [masters, setMasters] = useState([]);
+  const [services, setServices] = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [form, setForm] = useState({
+    master_id: "",
+    date: "",
+    time: "",
+    client_name: "",
+    client_phone: "",
+    service_id: "",
+  });
+
+  const hours = Array.from({ length: 12 }, (_, i) => i + 9);
+
+  const statuses = [
+    { value: "booked", label: "📌 Забронировано", color: "#facc15" },
+    { value: "confirmed", label: "✅ Завершено", color: "#22c55e" },
+    { value: "cancelled", label: "❌ Отменено", color: "#ef4444" },
+  ];
+
+  useEffect(() => {
+    fetchMasters();
+    fetchServices();
+  }, []);
+
+  useEffect(() => {
+    fetchAppointments(date);
+  }, [date]);
+
+  const formatDate = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+
+  const fetchMasters = async () => {
+    try {
+      const res = await axiosInstance.get("/masters");
+      setMasters(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+      const res = await axiosInstance.get("/services");
+      setServices(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchAppointments = async (d) => {
+    try {
+      const res = await axiosInstance.get(`/admin/schedule/${formatDate(d)}`);
+      setAppointments(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const getAppointment = (masterId, hour) =>
+    appointments.find(
+      (a) => a.master_id === masterId && new Date(a.date_time).getHours() === hour
+    );
+
+  const createAppointment = async () => {
+    try {
+      await axiosInstance.post("/admin/appointments", {
+        ...form,
+        date_time: `${form.date} ${form.time}:00`,
+      });
+      setModalOpen(false);
+      fetchAppointments(date);
+    } catch (err) {
+      console.error(err.response?.data?.errors || err);
+    }
+  };
+
+  const updateStatus = async (app, newStatus) => {
+    try {
+      await axiosInstance.put(`/appointments/${app.id}`, { status: newStatus });
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === app.id ? { ...a, status: newStatus } : a))
+      );
+      setEditing(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.wrapper}>
+        <div className={styles.calendarBox}>
+          <Calendar value={date} onChange={setDate} />
+        </div>
+
+        <div className={styles.schedule}>
+          <table>
+            <thead>
+              <tr>
+                <th>Время</th>
+                {masters.map((m) => (
+                  <th key={m.id}>{m.name}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {hours.map((hour) => (
+                <tr key={hour}>
+                  <td>{hour}:00</td>
+                  {masters.map((m) => {
+                    const app = getAppointment(m.id, hour);
+                    return (
+                      <td
+                        key={m.id}
+                        className={app ? styles.busyCard : styles.freeCard}
+                        onClick={() => {
+                          if (!app) {
+                            setForm({
+                              master_id: m.id,
+                              date: formatDate(date),
+                              time: `${hour.toString().padStart(2, "0")}:00`,
+                              client_name: "",
+                              client_phone: "",
+                              service_id: "",
+                            });
+                            setModalOpen(true);
+                          }
+                        }}
+                      >
+                        {app ? (
+                          <div className={styles.appCard}>
+                            <div className={styles.clientName}>{app.client_name}</div>
+                            <div className={styles.serviceInfo}>
+                              {app.service?.name} — {app.service?.price || 0}₸
+                            </div>
+                            <div className={styles.phone}>
+                              📞{" "}
+                              <a href={`tel:${app.client_phone}`}>
+                                {app.client_phone}
+                              </a>
+                            </div>
+
+                            {editing === app.id ? (
+                              <select
+                                autoFocus
+                                value={app.status || "booked"}
+                                onChange={(e) => updateStatus(app, e.target.value)}
+                                onBlur={() => setEditing(null)}
+                                className={styles.statusSelect}
+                              >
+                                {statuses.map((s) => (
+                                  <option key={s.value} value={s.value}>
+                                    {s.label}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <div
+                                className={styles.status}
+                                style={{
+                                  background:
+                                    statuses.find((s) => s.value === app.status)?.color ||
+                                    "#9ca3af",
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditing(app.id);
+                                }}
+                              >
+                                {statuses.find((s) => s.value === app.status)?.label ||
+                                  "📌 Забронировано"}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span>Свободно</span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 💰 Таблица выручки */}
+      <div className={styles.revenue}>
+        <h3>💰 Выручка за {formatDate(date)}</h3>
+        <table className={styles.revenueTable}>
+          <thead>
+            <tr>
+              <th>Сотрудник</th>
+              <th>Общая</th>
+              <th>✅ Confirmed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {masters.map((m) => {
+              const all = appointments
+                .filter((a) => a.master_id === m.id)
+                .reduce((sum, a) => sum + (a.service?.price || 0), 0);
+
+              const confirmed = appointments
+                .filter((a) => a.master_id === m.id && a.status === "confirmed")
+                .reduce((sum, a) => sum + (a.service?.price || 0), 0);
+
+              return (
+                <tr key={m.id}>
+                  <td>{m.name}</td>
+                  <td>{all}₸</td>
+                  <td>{confirmed}₸</td>
+                </tr>
+              );
+            })}
+            <tr className={styles.totalRow}>
+              <td>
+                <b>Итого</b>
+              </td>
+              <td>
+                <b>
+                  {appointments.reduce(
+                    (sum, a) => sum + (a.service?.price || 0),
+                    0
+                  )}
+                  ₸
+                </b>
+              </td>
+              <td>
+                <b>
+                  {appointments
+                    .filter((a) => a.status === "confirmed")
+                    .reduce((sum, a) => sum + (a.service?.price || 0), 0)}
+                  ₸
+                </b>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* 📌 Модальное окно */}
+      {modalOpen && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Новая запись</h3>
+            <input
+              type="text"
+              placeholder="Имя клиента"
+              value={form.client_name}
+              onChange={(e) => setForm({ ...form, client_name: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Телефон"
+              value={form.client_phone}
+              onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
+            />
+            <select
+              value={form.service_id}
+              onChange={(e) => setForm({ ...form, service_id: e.target.value })}
+            >
+              <option value="">Выберите услугу</option>
+              {services.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} — {s.price}₸
+                </option>
+              ))}
+            </select>
+            <div className={styles.modalActions}>
+              <button onClick={createAppointment}>Сохранить</button>
+              <button onClick={() => setModalOpen(false)}>Отмена</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

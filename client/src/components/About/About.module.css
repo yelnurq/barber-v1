@@ -1,0 +1,215 @@
+/* About.module.css */
+
+.about {
+  padding: 48px 16px;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.about h2 {
+  font-size:1.8rem;
+  font-weight: 700;
+    display: flex;
+  justify-content: right;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: #e0a800;
+}
+
+.container {
+  max-width: 1100px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 32px;
+  align-items: center;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(12, 15, 20, 0.06);
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* Изображение */
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  vertical-align: middle;
+  transform-origin: center;
+}
+
+/* Лёгкий эффект при наведении (если нужно) */
+.image:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(12, 15, 20, 0.12);
+}
+
+/* Текстовая часть */
+.text {
+  padding: 8px 12px;
+  color: #c8c8c8;
+}
+
+.text p {
+  margin: 0;
+  line-height: 1.62;
+  font-size: 19px;
+  color: #c8c8c8;
+}
+
+.textSpan {
+    color:#b48804;
+}
+
+/* Акцентная строка (если захочешь добавить отдельный заголовок) */
+.title {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #0b1220;
+}
+
+/* Мелкие детали: кнопки, контакт/теги */
+.meta {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #121212 0%, #2b2b2b 100%);
+  color: #fff;
+  font-size: 13px;
+}
+
+/* Адаптив */
+@media (max-width: 880px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .image {
+    height: 260px;
+  }
+
+  .text p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 420px) {
+  .image {
+    height: 200px;
+    border-radius: 10px;
+  }
+
+  .container {
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .text p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+/* Слайдер с 3 блоками */
+.slider {
+  margin-top: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-bottom: 40px;
+  justify-content: center;
+    max-width: 1100px;
+
+}
+
+.slides {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 90%;
+  max-width: 1000px;
+}
+
+.slide {
+  height: 260px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  transition: transform 0.3s;
+}
+
+.slide:hover {
+  transform: translateY(-6px);
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Кнопки */
+.prev, .next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(20, 20, 20, 0.6);
+  color: #fff;
+  border: none;
+  font-size: 36px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 50%;
+  transition: background 0.3s;
+  z-index: 2;
+}
+
+.prev:hover, .next:hover {
+  background: rgba(20, 20, 20, 0.9);
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+/* Адаптив */
+@media (max-width: 900px) {
+  .slides {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .slides {
+    grid-template-columns: 1fr;
+  }
+}

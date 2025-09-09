@@ -1,0 +1,235 @@
+.wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+  background: #121212;
+  min-height: 100vh;
+  color: #e5e7eb;
+}
+
+.wrapper, .modal, .revenue {
+  font-family: 'Inter', sans-serif;
+}
+
+.calendarBox {
+  flex: 0 0 280px;
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.schedule {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.schedule table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.schedule th, .schedule td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.schedule th {
+  background: #1e293b;
+  color: #f9fafb;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+
+.freeCard {
+  background: #1f1f1f;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  color: #cbd5e1;
+}
+
+.freeCard:hover {
+  background: #374151;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.busyCard {
+  background: #2a1f1f;
+  border-left: 4px solid #ef4444;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #f3f4f6;
+}
+
+.busyCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+}
+
+.appCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clientName {
+  font-weight: 600;
+  font-size: 15px;
+  color: #f9fafb;
+}
+
+.serviceInfo {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.phone a {
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.phone a:hover {
+  text-decoration: underline;
+}
+
+.status {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.booked { background-color: #facc15; color: #000; }
+.confirmed { background-color: #22c55e; }
+.cancelled { background-color: #ef4444; }
+
+.revenue {
+  margin-top: 30px;
+  background: #1f1f1f;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.revenueTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.revenueTable th, .revenueTable td {
+  padding: 10px 12px;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.revenueTable th {
+  background: #374151;
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+.totalRow td {
+  background: #b91c1c33;
+  font-weight: bold;
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+.modalContent {
+  background: #1f1f1f;
+  padding: 25px;
+  border-radius: 16px;
+  min-width: 340px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  animation: slideIn 0.2s;
+  color: #e5e7eb;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modalContent input,
+.modalContent select {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #111827;
+  color: #f9fafb;
+}
+
+.modalContent input:focus,
+.modalContent select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modalActions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.modalActions button:first-child {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.modalActions button:first-child:hover {
+  background-color: #2563eb;
+}
+
+.modalActions button:last-child {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.modalActions button:last-child:hover {
+  background-color: #1f2937;
+}

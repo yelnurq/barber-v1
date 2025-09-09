@@ -1,11 +1,13 @@
 .form {
   display: flex;
+  margin-top: 30px;
   flex-direction: column;
   gap: 1rem;
 }
 
 .input, .select, .datetime {
   padding: 0.8rem;
+  font-size: 16px;
   border: 1px solid #444;
   border-radius: 5px;
   background: #222;
@@ -61,4 +63,66 @@
 .active {
   background: #ff9900;
   color: #000;
+}
+/* Сегодня */
+:global(.react-calendar__tile--now) {
+  background: #222 !important;
+  color: #fff !important;
+}
+
+/* Сегодня при ховере */
+:global(.react-calendar__tile--now:enabled:hover) {
+  background: #444 !important;
+  color: #fff !important;
+}
+
+/* Сегодня при фокусе (выбранная дата клавиатурой) */
+:global(.react-calendar__tile--now:focus) {
+  background: #444 !important;
+  color: #fff !important;
+}
+
+:global(.react-calendar) {
+  width: 100% !important;
+}
+
+.loaderOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loader {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #4caf50;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.statusMessage {
+  margin: 15px 0;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.success {
+  background: #e6f9ee;
+  color: #2e7d32;
+}
+
+.error {
+  background: #fdecea;
+  color: #c62828;
 }

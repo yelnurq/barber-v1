@@ -1,8 +1,10 @@
+// BookingForm.jsx
 import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import Calendar from "react-calendar";
-import 'react-calendar/dist/Calendar.css';
+import "react-calendar/dist/Calendar.css";
 import styles from "./BookingForm.module.css";
+import { IMaskInput } from "react-imask";
 
 export default function BookingForm() {
   const [form, setForm] = useState({
@@ -11,22 +13,22 @@ export default function BookingForm() {
     master_id: "",
     service_id: "",
     date: "",
-    time: ""
+    time: "",
   });
   const [calendarDate, setCalendarDate] = useState(null);
   const [masters, setMasters] = useState([]);
   const [services, setServices] = useState([]);
   const [slots, setSlots] = useState([]);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
-  // Загрузка мастеров и услуг
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null); // success | error | null
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [mastersRes, servicesRes] = await Promise.all([
           axiosInstance.get("/masters"),
-          axiosInstance.get("/services")
+          axiosInstance.get("/services"),
         ]);
         setMasters(mastersRes.data);
         setServices(servicesRes.data);
@@ -37,7 +39,6 @@ export default function BookingForm() {
     fetchData();
   }, []);
 
-  // Получение занятых слотов
   const getSlots = async (date, master_id) => {
     try {
       const res = await axiosInstance.get(
@@ -49,7 +50,6 @@ export default function BookingForm() {
     }
   };
 
-  // Обновление слотов при выборе даты и мастера
   useEffect(() => {
     if (form.date && form.master_id) {
       getSlots(form.date, form.master_id);
@@ -59,36 +59,40 @@ export default function BookingForm() {
   const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setStatus(null);
+
     try {
       await axiosInstance.post("/appointments", {
         ...form,
-        date_time: `${form.date}T${form.time}`
+        date_time: `${form.date}T${form.time}`,
       });
-      setSuccess(true);
-      setError("");
+
+      setStatus("success");
       setForm({
         client_name: "",
         client_phone: "",
         master_id: "",
         service_id: "",
         date: "",
-        time: ""
+        time: "",
       });
       setCalendarDate(null);
       setSlots([]);
     } catch (err) {
-      setError("Ошибка при записи. Попробуйте снова.");
+      setStatus("error");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Генерация часов
   const generateHours = () => {
     const hours = [];
     for (let h = 9; h <= 20; h++) {
@@ -98,101 +102,118 @@ export default function BookingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
-      {success && <p style={{ color: "green" }}>✅ Запись успешно отправлена!</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* Имя и телефон */}
-      <input
-        type="text"
-        name="client_name"
-        placeholder="Ваше имя"
-        value={form.client_name}
-        onChange={handleChange}
-        className={styles.input}
-        required
-      />
-      <input
-        type="tel"
-        name="client_phone"
-        placeholder="Телефон"
-        value={form.client_phone}
-        onChange={handleChange}
-        className={styles.input}
-        required
-      />
-
-      {/* 1️⃣ Выбор услуги */}
-      <select
-        name="service_id"
-        value={form.service_id}
-        onChange={handleChange}
-        className={styles.select}
-        required
-      >
-        <option value="">Выберите услугу</option>
-        {services.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.name} ({s.price}₸)
-          </option>
-        ))}
-      </select>
-
-      {/* 2️⃣ Выбор мастера */}
-      <select
-        name="master_id"
-        value={form.master_id}
-        onChange={handleChange}
-        className={styles.select}
-        required
-        disabled={!form.service_id}
-      >
-        <option value="">Выберите мастера</option>
-        {masters.map((m) => (
-          <option key={m.id} value={m.id}>
-            {m.name} — {m.specialization}
-          </option>
-        ))}
-      </select>
-
-      {/* 3️⃣ Календарь */}
-      {form.master_id && (
-        <Calendar
-          minDate={new Date()}
-          onChange={(date) => {
-            setCalendarDate(date);
-            setForm({
-              ...form,
-              date: date.toISOString().split("T")[0]
-            });
-          }}
-          value={calendarDate}
-        />
-      )}
-
-      {/* 4️⃣ Выбор времени */}
-      {form.date && (
-        <div className={styles.timeGrid}>
-          {generateHours().map((hour) => {
-            const isBooked = slots.includes(hour);
-            return (
-              <button
-                key={hour}
-                type="button"
-                disabled={isBooked}
-                className={`${styles.timeSlot} ${form.time === hour ? styles.active : ""}`}
-                onClick={() => setForm({ ...form, time: hour })}
-              >
-                {hour}
-              </button>
-            );
-          })}
+    <>
+      {/* ✅ Лоадер во весь экран */}
+      {loading && (
+        <div className={styles.loaderOverlay}>
+          <div className={styles.loader}></div>
         </div>
       )}
 
-      <button type="submit" className={styles.button} disabled={!form.time}>
-        Записаться
-      </button>
-    </form>
+      {/* ✅ Сообщение после загрузки */}
+      {status === "success" && (
+        <div className={`${styles.statusMessage} ${styles.success}`}>
+          ✅ Запись успешно отправлена!
+        </div>
+      )}
+      {status === "error" && (
+        <div className={`${styles.statusMessage} ${styles.error}`}>
+          ❌ Ошибка при записи. Попробуйте снова.
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <input
+          type="text"
+          name="client_name"
+          placeholder="Ваше имя"
+          value={form.client_name}
+          onChange={handleChange}
+          className={styles.input}
+          required
+        />
+        <IMaskInput
+          mask="+7 (000) 000-00-00"
+          type="tel"
+          name="client_phone"
+          placeholder="+7 (___) ___-__-__"
+          className={styles.input}
+          value={form.client_phone}
+          onAccept={(value) => setForm({ ...form, client_phone: value })}
+          required
+        />
+
+        <select
+          name="service_id"
+          value={form.service_id}
+          onChange={handleChange}
+          className={styles.select}
+          required
+        >
+          <option value="">Выберите услугу</option>
+          {services.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name} ({s.price}₸)
+            </option>
+          ))}
+        </select>
+
+        <select
+          name="master_id"
+          value={form.master_id}
+          onChange={handleChange}
+          className={styles.select}
+          required
+          disabled={!form.service_id}
+        >
+          <option value="">Выберите мастера</option>
+          {masters.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.name} — {m.specialization}
+            </option>
+          ))}
+        </select>
+
+        {form.master_id && (
+          <Calendar
+            minDate={new Date()}
+            onChange={(date) => {
+              setCalendarDate(date);
+              const localDate = date.toLocaleDateString("sv-SE");
+              setForm({
+                ...form,
+                date: localDate,
+              });
+            }}
+            value={calendarDate}
+          />
+        )}
+
+        {form.date && (
+          <div className={styles.timeGrid}>
+            {generateHours().map((hour) => {
+              const isBooked = slots.includes(hour);
+              return (
+                <button
+                  key={hour}
+                  type="button"
+                  disabled={isBooked}
+                  className={`${styles.timeSlot} ${
+                    form.time === hour ? styles.active : ""
+                  }`}
+                  onClick={() => setForm({ ...form, time: hour })}
+                >
+                  {hour}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        <button type="submit" className={styles.button} disabled={!form.time}>
+          Записаться
+        </button>
+      </form>
+    </>
   );
 }

@@ -6,19 +6,29 @@
   height: 100%;
   background: rgba(0,0,0,0.7);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start; /* прижимаем влево */
+  align-items: stretch; /* растягиваем на всю высоту */
   z-index: 9999;
 }
 
 .modal {
   background: #1a1a1a;
+  overflow: auto;
   color: #fff;
   padding: 2rem;
-  border-radius: 10px;
   width: 90%;
-  max-width: 500px;
+  max-width: 600px; /* ширина сайдбара */
+  height: 100%; /* на всю высоту экрана */
   position: relative;
+  border-radius: 0; /* убираем скругления */
+  transform: translateX(-100%);
+  animation: slideIn 0.3s forwards;
+}
+
+@keyframes slideIn {
+  to {
+    transform: translateX(0);
+  }
 }
 
 .close {
