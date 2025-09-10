@@ -67,7 +67,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   // Проверка: телефон должен быть 10 цифр после +7
-  if (!form.client_phone || form.client_phone.length !== 10) {
+  if (!form.client_phone || form.client_phone.length !== 11) {
     alert("Пожалуйста, заполните номер телефона полностью!");
     return;
   }
@@ -155,7 +155,7 @@ const generateHours = () => {
           required
         />
 <IMaskInput
-  mask="+7 (000) 000-00-00"
+  mask="+{7} (000) 000-00-00"
   type="tel"
   name="client_phone"
   placeholder="+7 (___) ___-__-__"
@@ -166,6 +166,7 @@ const generateHours = () => {
   }
   required
 />
+
 
         <select
           name="service_id"

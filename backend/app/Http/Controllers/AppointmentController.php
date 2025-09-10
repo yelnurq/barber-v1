@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use App\Jobs\SendTelegramNotification;
 use Carbon\Carbon;
-
+use App\Models\Master;
+use App\Models\Service;
+use Illuminate\Support\Facades\Http;
 class AppointmentController extends Controller
 {
     public function index()
@@ -13,35 +16,54 @@ class AppointmentController extends Controller
         return Appointment::with(['master', 'service'])->get();
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'client_name'   => 'required|string|max:255',
-            'client_phone'  => 'required|string|max:20',
-            'master_id'     => 'required|exists:masters,id',
-            'service_id'    => 'required|exists:services,id',
-            'date_time'     => 'required|date|after:now',
-        ]);
 
-        $dateTime = Carbon::parse($validated['date_time'])->format('Y-m-d H:00');
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'client_name'   => 'required|string|max:255',
+        'client_phone'  => 'required|string|max:20',
+        'master_id'     => 'required|exists:masters,id',
+        'service_id'    => 'required|exists:services,id',
+        'date_time'     => 'required|date|after:now',
+    ]);
 
-        // Проверяем, есть ли запись на этот час у мастера
-        $exists = Appointment::where('master_id', $validated['master_id'])
-            ->whereRaw("DATE_FORMAT(date_time, '%Y-%m-%d %H:00') = ?", [$dateTime])
-            ->exists();
+    $dateTime = Carbon::parse($validated['date_time'])->format('Y-m-d H:00');
 
-        if ($exists) {
-            return response()->json([
-                'message' => '❌ Этот слот уже занят. Выберите другое время.'
-            ], 422);
-        }
+    $exists = Appointment::where('master_id', $validated['master_id'])
+        ->whereRaw("DATE_FORMAT(date_time, '%Y-%m-%d %H:00') = ?", [$dateTime])
+        ->exists();
 
-        $appointment = Appointment::create($validated);
-
-        // Здесь можно добавить отправку уведомления (email/telegram)
-
-        return response()->json($appointment, 201);
+    if ($exists) {
+        return response()->json([
+            'message' => '❌ Этот слот уже занят. Выберите другое время.'
+        ], 422);
     }
+
+    $appointment = Appointment::create($validated);
+
+    // ---------- Подготавливаем данные для уведомления ----------
+    $masterName = Master::find($validated['master_id'])->name;
+    $serviceName = Service::find($validated['service_id'])->name;
+    $formattedDate = Carbon::parse($validated['date_time'])->format('d.m.Y H:i');
+
+    $message = "Новая запись!\n"
+             . "Имя: {$validated['client_name']}\n"
+             . "Телефон: +{$validated['client_phone']}\n"
+             . "Мастер: {$masterName}\n"
+             . "Услуга: {$serviceName}\n"
+             . "Дата и время: {$formattedDate}";
+
+    $botToken = env('TELEGRAM_BOT_TOKEN');
+    $chatId = env('TELEGRAM_CHAT_ID');
+
+    // ---------- Отправка уведомления через очередь ----------
+    SendTelegramNotification::dispatch($message, $botToken, $chatId);
+
+    // Возвращаем ответ пользователю сразу
+    return response()->json($appointment, 201);
+}
+
+
 
     public function update(Request $request, Appointment $appointment)
     {
