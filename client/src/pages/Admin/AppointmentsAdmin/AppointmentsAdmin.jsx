@@ -103,6 +103,16 @@ export default function AppointmentsAdmin() {
       console.error(err);
     }
   };
+  const deleteAppointment = async (app) => {
+  if (!window.confirm("Удалить запись?")) return;
+  try {
+    await axiosInstance.delete(`/appointments/${app.id}`);
+    setAppointments((prev) => prev.filter((a) => a.id !== app.id));
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 const formatDateNumeric = (date) => {
   const d = date.getDate().toString().padStart(2, "0");
   const m = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -127,18 +137,29 @@ const formatDateNumeric = (date) => {
                   <div className={styles.skeletonCell}></div>
                   <div className={styles.skeletonCell}></div>
                   <div className={styles.skeletonCell}></div>
+                  <div className={styles.skeletonCell}></div>
+                  <div className={styles.skeletonCell}></div>
+                  <div className={styles.skeletonCell}></div>
                 </div>
               ))}
             </div>
           ) : (
             <div className={styles.revenue}>
-              <h3>{formatDateNumeric(date)}</h3>
+              <div className={styles.revenueHeader}>
+                <h3>{formatDateNumeric(date)}</h3>
+                <button
+                  className={styles.refreshBtn}
+                  onClick={() => fetchAppointments(date)}
+                >
+                  🔄 Обновить
+                </button>
+              </div>
               <table className={styles.revenueTable}>
                 <thead>
                   <tr>
                     <th>Сотрудник</th>
                     <th>Общая</th>
-                    <th>✅ Confirmed</th>
+                    <th>Подтверждено</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -246,51 +267,61 @@ const formatDateNumeric = (date) => {
                               }}
                             >
                               {app ? (
-                                <div
-                                  className={styles.appCard}
+<div className={styles.appCard}>
+    {editing === app.id ? (
+    <select
+      autoFocus
+      value={app.status || "booked"}
+      onChange={(e) => updateStatus(app, e.target.value)}
+      onBlur={() => setEditing(null)}
+      className={styles.statusSelect}
+    >
+      {statuses.map((s) => (
+        <option key={s.value} value={s.value}>
+          {s.label}
+        </option>
+      ))}
+    </select>
+  ) : (
+    <div
+      className={styles.status}
+      style={{
+        background:
+          statuses.find((s) => s.value === app.status)?.color || "#9ca3af",
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setEditing(app.id);
+      }}
+    >
+      {statuses.find((s) => s.value === app.status)?.label ||
+        "📌 Забронировано"}
+    </div>
+  )}
+  <div className={styles.clientName}>{app.client_name}</div>
+  <div className={styles.serviceInfo}>
+    {app.service?.name} — {app.service?.price || 0}₸
+  </div>
+  <div className={styles.phone}>
+    📞 <a href={`tel:${app.client_phone}`}>+{app.client_phone}</a>
+  </div>
 
-                                >
-                                  <div className={styles.clientName}>{app.client_name}</div>
-                                  <div className={styles.serviceInfo}>
-                                    {app.service?.name} — {app.service?.price || 0}₸
-                                  </div>
-                                  <div className={styles.phone}>
-                                    📞{" "}
-                                    <a href={`tel:${app.client_phone}`}>+{app.client_phone}</a>
-                                  </div>
 
-                                  {editing === app.id ? (
-                                    <select
-                                      autoFocus
-                                      value={app.status || "booked"}
-                                      onChange={(e) => updateStatus(app, e.target.value)}
-                                      onBlur={() => setEditing(null)}
-                                      className={styles.statusSelect}
-                                    >
-                                      {statuses.map((s) => (
-                                        <option key={s.value} value={s.value}>
-                                          {s.label}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  ) : (
-                                    <div
-                                      className={styles.status}
-                                      style={{
-                                        background:
-                                          statuses.find((s) => s.value === app.status)?.color ||
-                                          "#9ca3af",
-                                      }}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditing(app.id);
-                                      }}
-                                    >
-                                      {statuses.find((s) => s.value === app.status)?.label ||
-                                        "📌 Забронировано"}
-                                    </div>
-                                  )}
-                                </div>
+
+  {/* 🗑 Кнопка удаления */}
+  <button
+    className={styles.deleteBtn}
+    onClick={(e) => {
+      e.stopPropagation();
+      deleteAppointment(app);
+    }}
+  >
+    🗑
+  </button>
+    {/* Статус */}
+
+</div>
+
                               ) : (
                                 <span>Свободно</span>
                               )}

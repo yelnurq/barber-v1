@@ -11,22 +11,22 @@ class MasterSeeder extends Seeder
     {
         $masters = [
             [
-                'name' => 'Арман',
+                'name' => 'Арман1',
                 'specialization' => 'Эксперт по классическим стрижкам',
                 'phone' => '8-707-167-7785',
             ],
             [
-                'name' => 'Нурлан',
+                'name' => 'Нурлан2',
                 'specialization' => 'Мастер бороды и усов',
                 'phone' => '8-700-167-7785',
             ],
             [
-                'name' => 'Ержан',
+                'name' => 'Ержан3',
                 'specialization' => 'Современные мужские стрижки',
                 'phone' => '8-787-167-7785',
             ],
             [
-                'name' => 'Азамат',
+                'name' => 'Азамат4',
                 'phone' => '8-777-167-7785',
                 'specialization' => 'Fade и молодежные стили',
             ],

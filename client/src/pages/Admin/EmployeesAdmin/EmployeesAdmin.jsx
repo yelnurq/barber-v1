@@ -36,7 +36,7 @@ export default function EmployeesAdmin() {
       }
       setModalOpen(false);
       setEditing(null);
-      setForm({ name: "", phone: "", specialty: "" });
+      setForm({ name: "", phone: "", specialization: "" });
       fetchMasters();
     } catch (err) {
       console.error("Ошибка сохранения мастера", err);
@@ -116,8 +116,8 @@ const deleteMaster = async (id) => {
             <input
               type="text"
               placeholder="Специальность"
-              value={form.specialty}
-              onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+              value={form.specialization}
+              onChange={(e) => setForm({ ...form, specialization: e.target.value })}
             />
             <div className={styles.modalActions}>
               <button onClick={saveMaster}>{editing ? "Сохранить" : "Добавить"}</button>
