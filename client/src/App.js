@@ -5,6 +5,7 @@ import Home from "./pages/Home/Home";
 import AppointmentsAdmin from "./pages/Admin/AppointmentsAdmin/AppointmentsAdmin";
 import EmployeesAdmin from "./pages/Admin/EmployeesAdmin/EmployeesAdmin";
 import StatisticsAdmin from "./pages/Admin/StatisticsAdmin/StatisticsAdmin";
+import Clients from "./pages/Admin/Clients/Clients";
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
         <Route path='/admin' element={<AppointmentsAdmin/>} />
         <Route path='/admin/employees' element={<EmployeesAdmin/>} />
         <Route path='/admin/statistics' element={<StatisticsAdmin/>} />
+        <Route path='/admin/clients' element={<Clients/>} />
       </Routes>
     </BrowserRouter>
   );

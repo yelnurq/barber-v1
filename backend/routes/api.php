@@ -31,7 +31,9 @@ Route::get('/admin/statistics/{date}', [AdminAppointmentController::class, 'dail
 Route::get('/admin/statistics', [AdminAppointmentController::class, 'period']); // ?start=2025-09-01&end=2025-09-09
 Route::get('/admin/statistics-total', [AdminAppointmentController::class, 'total']);
 
-    Route::delete('/admin/appointments/{id}', [\App\Http\Controllers\Admin\AppointmentController::class, 'destroy']);
+Route::delete('/admin/appointments/{id}', [\App\Http\Controllers\Admin\AppointmentController::class, 'destroy']);
 });
 
+Route::get('/admin/statistics-summary', [AdminAppointmentController::class, 'summary']);
+Route::get('/admin/clients', [AdminAppointmentController::class, 'clientBase']);
 
