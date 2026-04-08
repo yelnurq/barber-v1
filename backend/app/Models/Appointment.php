@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Appointment extends Model
 {
     protected $fillable = [
-        'master_id', 'service_id', 'client_name', 'client_phone', 'date_time', 'status'
+        'master_id', 'service_id', 'client_name', 'client_phone', 'date_time', 'status', 'date', 'time'
     ];
 
     protected $dates = ['date_time'];

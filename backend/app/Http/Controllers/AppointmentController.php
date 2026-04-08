@@ -57,7 +57,7 @@ public function store(Request $request)
     $chatId = env('TELEGRAM_CHAT_ID');
 
     // ---------- Отправка уведомления через очередь ----------
-    SendTelegramNotification::dispatch($message, $botToken, $chatId);
+    // SendTelegramNotification::dispatch($message, $botToken, $chatId);
 
     // Возвращаем ответ пользователю сразу
     return response()->json($appointment, 201);
