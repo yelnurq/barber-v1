@@ -27,10 +27,12 @@ public function store(Request $request)
         'date_time'     => 'required|date|after:now',
     ]);
 
-    $dateTime = Carbon::parse($validated['date_time'])->format('Y-m-d H:00');
+    // Приводим время к началу часа (например, 13:25 -> 13:00)
+    $dateTime = Carbon::parse($validated['date_time'])->startOfHour();
 
+    // Универсальная проверка для любой БД
     $exists = Appointment::where('master_id', $validated['master_id'])
-        ->whereRaw("DATE_FORMAT(date_time, '%Y-%m-%d %H:00') = ?", [$dateTime])
+        ->where('date_time', $dateTime)
         ->exists();
 
     if ($exists) {
@@ -39,6 +41,8 @@ public function store(Request $request)
         ], 422);
     }
 
+    // Сохраняем именно очищенное время (без минут), чтобы потом было легче проверять
+    $validated['date_time'] = $dateTime;
     $appointment = Appointment::create($validated);
 
     // ---------- Подготавливаем данные для уведомления ----------
@@ -53,13 +57,6 @@ public function store(Request $request)
              . "Услуга: {$serviceName}\n"
              . "Дата и время: {$formattedDate}";
 
-    $botToken = env('TELEGRAM_BOT_TOKEN');
-    $chatId = env('TELEGRAM_CHAT_ID');
-
-    // ---------- Отправка уведомления через очередь ----------
-    // SendTelegramNotification::dispatch($message, $botToken, $chatId);
-
-    // Возвращаем ответ пользователю сразу
     return response()->json($appointment, 201);
 }
 

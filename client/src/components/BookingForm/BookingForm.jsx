@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../api/axios";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+// import "react-calendar/dist/Calendar.css";
 import styles from "./BookingForm.module.css";
 import { IMaskInput } from "react-imask";
 
@@ -199,20 +199,19 @@ const generateHours = () => {
           ))}
         </select>
 
-        {form.master_id && (
-          <Calendar
-            minDate={new Date()}
-            onChange={(date) => {
-              setCalendarDate(date);
-              const localDate = date.toLocaleDateString("sv-SE");
-              setForm({
-                ...form,
-                date: localDate,
-              });
-            }}
-            value={calendarDate}
-          />
-        )}
+     {form.master_id && (
+  <div className={styles.calendarContainer}>
+    <Calendar
+      minDate={new Date()}
+      onChange={(date) => {
+        setCalendarDate(date);
+        const localDate = date.toLocaleDateString("sv-SE");
+        setForm({ ...form, date: localDate });
+      }}
+      value={calendarDate}
+    />
+  </div>
+)}
 
 {form.date && (
   <div className={styles.timeGrid}>

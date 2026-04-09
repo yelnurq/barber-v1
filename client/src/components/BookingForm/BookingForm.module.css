@@ -125,4 +125,138 @@
 .error {
   background: #fdecea;
   color: #c62828;
+
+}/* Контейнер-обертка */
+.calendarContainer {
+  width: 100%;
+  margin: 15px 0; /* Такой же отступ, как между инпутами */
+  display: block;
+}
+
+/* Сам календарь */
+.calendarContainer :global(.react-calendar) {
+  background-color: #111113 !important; /* Цвет фона как у инпутов */
+  
+  /* Делаем рамку точно такой же, как у ваших полей ввода */
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  
+  /* Убираем скругления, чтобы совпадало с вашим запросом */
+  border-radius: 0 !important;
+  
+  /* Растягиваем на всю ширину и фиксируем алгоритм расчета */
+  width: 100% !important;
+  box-sizing: border-box !important;
+  
+  /* Убираем лишние внутренние отступы библиотеки */
+  padding: 10px 0 !important;
+  font-family: inherit;
+}
+
+/* Шапка с месяцем */
+.calendarContainer :global(.react-calendar__navigation) {
+  margin-bottom: 10px;
+  background: none;
+  text-align: center;
+}
+
+.calendarContainer :global(.react-calendar__navigation button) {
+  color: white !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+/* Стилизация сетки дней */
+.calendarContainer :global(.react-calendar__month-view__weekdays) {
+  color: #d4af37 !important; /* Золотой акцент */
+  font-weight: 800;
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 10px;
+  padding-bottom: 10px;
+}
+
+.calendarContainer :global(.react-calendar__month-view__weekdays__weekday) {
+  padding: 5px 0;
+}
+/* Выравниваем контейнер дней недели */
+.calendarContainer :global(.react-calendar__month-view__weekdays) {
+  display: flex !important;
+  justify-content: space-around !important; /* Распределяем равномерно */
+  text-align: center !important; /* Центрируем текст внутри каждой ячейки */
+  color: #d4af37 !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  margin-bottom: 15px;
+  padding: 0 !important;
+}
+/* Прошедшие даты (отключенные) */
+.calendarContainer :global(.react-calendar__tile:disabled) {
+  background-color: transparent !important;
+  /* Красим текст в тускло-серый */
+  color: #444 !important; 
+  cursor: not-allowed !important;
+}
+
+/* Убираем эффект ховера для прошедших дат */
+.calendarContainer :global(.react-calendar__tile:disabled:enabled:hover) {
+  background-color: transparent !important;
+}
+
+/* Если нужно сделать их еще менее заметными (полупрозрачными) */
+.calendarContainer :global(.react-calendar__month-view__days__day--past),
+.calendarContainer :global(.react-calendar__tile:disabled) {
+  opacity: 0.4;
+}
+/* Принудительно центрируем каждый отдельный день */
+.calendarContainer :global(.react-calendar__month-view__weekdays__weekday) {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 5px 0 !important;
+}
+
+/* Убираем стандартное подчеркивание у тега abbr внутри дней */
+.calendarContainer :global(.react-calendar__month-view__weekdays__weekday abbr) {
+  text-decoration: none !important;
+  cursor: default;
+}
+/* Кнопки дат */
+.calendarContainer :global(.react-calendar__tile) {
+  color: white !important;
+  background: none;
+  border-radius: 0 !important;
+  padding: 15px 5px !important; /* Увеличиваем высоту для удобства клика */
+  font-size: 14px;
+}
+
+/* Активная (выбранная) дата */
+.calendarContainer :global(.react-calendar__tile--active) {
+  background: #d4af37 !important; /* Золотой фон */
+  color: #000 !important; /* Черные цифры на золотом фоне */
+  font-weight: 900;
+}
+
+/* Сегодняшняя дата (делаем просто золотую рамку или текст) */
+.calendarContainer :global(.react-calendar__tile--now) {
+  background: rgba(212, 175, 55, 0.1) !important;
+  color: #d4af37 !important;
+}
+
+/* При наведении */
+.calendarContainer :global(.react-calendar__tile:enabled:hover) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Отключаем подчеркивание в названиях дней */
+.calendarContainer :global(abbr) {
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+/* Скрываем/затемняем дни других месяцев */
+.calendarContainer :global(.react-calendar__month-view__days__day--neighboringMonth) {
+  color: #333 !important;
+  opacity: 0.5;
 }
