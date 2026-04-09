@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         ServiceSeeder::class,
         UserSeeder::class,
         MasterSeeder::class,
+        AppointmentSeeder::class,
     ]);
 }
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 
 export default function AdminHeader() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +28,22 @@ useEffect(() => {
     { name: "Журнал", path: "/admin/" },
     { name: "Сотрудники", path: "/admin/employees" },
   ];
-
+const handleLogout = async () => {
+  try {
+    // 1. Отправляем запрос на бэкенд для удаления токена из БД
+    await axiosInstance.post('http://localhost:8000/api/logout');
+  } catch (error) {
+    // Даже если сервер вернул ошибку (например, токен уже протух), 
+    // мы все равно должны выкинуть пользователя из интерфейса
+    console.error('Ошибка при выходе на сервере:', error);
+  } finally {
+    // 2. Очищаем локальное хранилище в любом случае
+    localStorage.removeItem('token');
+    
+    // 3. Перенаправляем на логин
+    window.location.href = '/login';
+  }
+};
   return (
     <>
       {/* 1. OVERLAY (За пределами хедера) */}
@@ -63,7 +79,10 @@ useEffect(() => {
             );
           })}
           <div className="mt-auto pb-10 pt-8 border-t border-white/5">
-            <button className="text-rose-500 font-black uppercase text-xs tracking-[0.2em] w-full text-left px-4">
+            <button 
+              onClick={handleLogout}
+              className="text-rose-500 font-black uppercase text-xs tracking-[0.2em] w-full text-left px-4 py-2 hover:bg-rose-500/10 active:scale-95 transition-all outline-none"
+            >
               🚪 Выйти
             </button>
           </div>
@@ -90,7 +109,9 @@ useEffect(() => {
                 {link.name}
               </Link>
             ))}
-            <button className="text-[11px] font-black uppercase tracking-widest text-rose-500/80 hover:text-rose-500 ml-4">Выйти</button>
+            <button 
+              onClick={handleLogout}
+            className="text-[11px] font-black uppercase tracking-widest text-rose-500/80 hover:text-rose-500 ml-4">Выйти</button>
           </nav>
 
           {/* Burger Button */}
