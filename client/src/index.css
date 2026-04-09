@@ -44,7 +44,36 @@ input::-webkit-inner-spin-button {
 input[type=number] {
     -moz-appearance:textfield; 
 }
+/* Кастомизация календаря под темную тему */
+.calendarWrapper :global(.react-calendar) {
+  background: #111113; /* Цвет вашей панели */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  border-radius: 12px;
+  width: 100%;
+}
 
+.calendarWrapper :global(.react-calendar__tile) {
+  color: white;
+}
+
+.calendarWrapper :global(.react-calendar__tile:enabled:hover) {
+  background-color: rgba(212, 175, 55, 0.2); /* Золотистый при наведении */
+}
+
+.calendarWrapper :global(.react-calendar__tile--active) {
+  background: #d4af37 !important; /* Золотой для выбранной даты */
+  color: black !important;
+}
+
+.calendarWrapper :global(.react-calendar__navigation button:enabled:hover) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.calendarWrapper :global(.react-calendar__month-view__days__day--neighboringMonth) {
+  color: #444 !important; /* Дни другого месяца делаем тусклыми */
+}
 body {
   margin: 0;
   padding: 0;
