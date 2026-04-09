@@ -27,25 +27,25 @@ const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, i
             onClick={(e) => onDelete(e, appointment.id)}
             className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg hover:bg-rose-500"
           >
-            <span className="text-[10px]">×</span>
+            <span className="text-[20px]">×</span>
           </button>
 
           <div className="flex justify-between items-start mb-1">
             <button 
               onClick={(e) => { e.stopPropagation(); onEditStatus(appointment.id); }} 
-              className="text-[7px] font-black px-1 py-0.5 rounded bg-black/40 text-white hover:bg-[#d4af37]"
+              className="text-[10px] font-black px-1 py-0.5 rounded bg-black/40 text-white hover:bg-[#d4af37]"
             >
               {s.label}
             </button>
-            <span className="text-[9px] font-bold text-[#d4af37] leading-none">
+            <span className="text-[13px] font-bold text-[#d4af37] leading-none">
               {appointment.service?.price.toLocaleString()}
             </span>
           </div>
           
-          <div className="text-[10px] font-bold text-white uppercase truncate leading-tight">
+          <div className="text-[14px] font-bold text-white uppercase truncate leading-tight">
             {appointment.client_name}
           </div>
-          <div className="text-[8px] text-zinc-500 font-bold uppercase truncate">
+          <div className="text-[11px] text-zinc-500 font-bold uppercase truncate">
             {appointment.service?.name}
           </div>
           
@@ -56,7 +56,7 @@ const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, i
                 <button 
                   key={key} 
                   onClick={(e) => { e.stopPropagation(); updateStatus(appointment, key); }} 
-                  className="flex-1 text-[8px] font-black rounded hover:bg-[#d4af37] hover:text-black transition-colors uppercase"
+                  className="flex-1 text-[14px] font-black rounded hover:bg-[#d4af37] hover:text-black transition-colors uppercase"
                 >
                   {cfg.label}
                 </button>
@@ -65,8 +65,8 @@ const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, i
           )}
         </div>
       ) : (
-        <div className="h-8 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer">
-          <span className="text-[9px] text-zinc-800">+</span>
+        <div className="h-20 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer">
+          <span className="text-[30px] text-zinc-800">+</span>
         </div>
       )}
     </td>
@@ -188,19 +188,37 @@ const handleDelete = async (e, appointmentId) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] font-sans text-zinc-100 pb-20">
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 pb-20">
       <AdminHeader />
   <main className="max-w-[1600px] mx-auto p-4 lg:p-6"> {/* Уменьшил padding контейнера */}
   
   <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4"> {/* Уменьшил отступы */}
     <div className="space-y-2">
       <h1 className="text-3xl font-black uppercase italic text-white tracking-tighter">Журнал</h1>
-      <input 
-        type="date" 
-        value={currentDate} 
-        onChange={(e) => setCurrentDate(e.target.value)}
-        className="bg-[#111113] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#d4af37] font-bold outline-none focus:border-[#d4af37] transition-all"
-      />
+     <div className="relative group">
+  <input 
+    type="date" 
+    value={currentDate} 
+    onChange={(e) => setCurrentDate(e.target.value)}
+    className="
+      bg-[#111113] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#d4af37] font-bold outline-none 
+      focus:border-[#d4af37] transition-all w-full cursor-pointer
+      [color-scheme:dark]
+      [&::-webkit-calendar-picker-indicator]:absolute 
+      [&::-webkit-calendar-picker-indicator]:inset-0 
+      [&::-webkit-calendar-picker-indicator]:w-full 
+      [&::-webkit-calendar-picker-indicator]:h-full 
+      [&::-webkit-calendar-picker-indicator]:cursor-pointer 
+      [&::-webkit-calendar-picker-indicator]:opacity-0
+    "
+  />
+  {/* Дополнительный слой, чтобы показать, что кнопка кликабельна (опционально) */}
+  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity">
+    <svg className="w-4 h-4 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+</div>
     </div>
     <div className="flex gap-3">
       <StatCardSmall title="Выручка" value={`${stats.revenue.toLocaleString()} ₸`} />
@@ -209,7 +227,7 @@ const handleDelete = async (e, appointmentId) => {
   </div>
 
   <div className="flex flex-col xl:flex-row gap-4">
-    <div className="xl:w-64 flex-shrink-0 space-y-4"> {/* Сузил боковую панель */}
+    <div className="xl:w-80 flex-shrink-0 space-y-6"> {/* Сузил боковую панель */}
       <EfficiencyCard stats={stats} masters={masters} appointments={appointments} />
     </div>
 
@@ -277,7 +295,6 @@ const handleDelete = async (e, appointmentId) => {
   );
 }
 
-// --- Вспомогательные компоненты (Финальная карточка эффективности) ---
 function EfficiencyCard({ stats, masters, appointments }) {
   return (
     <div className="bg-[#111113] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
@@ -302,45 +319,42 @@ function EfficiencyCard({ stats, masters, appointments }) {
 
         {/* Детализация по мастерам */}
         <div className="pt-2">
-          {/* Шапка таблицы — 4 колонки: Имя, Кол-во, Принес (Грязными), ЗП (20%) */}
-          <div className="grid grid-cols-[1fr_40px_70px_70px] gap-2 mb-4 px-1">
-            <p className="text-[8px] text-zinc-500 uppercase font-black">Мастер</p>
-            <p className="text-[8px] text-zinc-500 uppercase font-black text-center">Визиты</p>
-            <p className="text-[8px] text-zinc-500 uppercase font-black text-right">Валовый</p>
-            <p className="text-[8px] text-zinc-500 uppercase font-black text-right">ЗП (20%)</p>
-          </div>
+          <p className="text-[10px] text-zinc-500 uppercase font-black mb-4 px-1 tracking-widest">Статистика мастеров</p>
           
-          <div className="space-y-5">
+          <div className="space-y-6">
             {masters.map(m => {
               const masterApps = appointments.filter(a => a.master_id === m.id && a.status === "confirmed");
               const masterRevenue = masterApps.reduce((s, a) => s + (a.service?.price || 0), 0);
               const masterSalary = masterRevenue * MASTER_PERCENT;
 
               return (
-                <div key={m.id} className="group">
-                  <div className="grid grid-cols-[1fr_40px_70px_70px] gap-2 items-center text-[13px] mb-2 px-1">
-                    {/* Имя */}
-                    <span className="text-zinc-300 font-bold group-hover:text-white transition-colors truncate uppercase">
+                <div key={m.id} className="group bg-white/[0.02] p-3 rounded-xl border border-white/5 hover:border-[#d4af37]/30 transition-all">
+                  {/* Имя мастера - теперь сверху и крупно */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-[13px] font-black text-white group-hover:text-[#d4af37] transition-colors uppercase italic truncate pr-2">
                       {m.name}
                     </span>
-                    {/* Количество услуг */}
-                    <span className="font-bold text-zinc-500 text-center">
-                      {masterApps.length}
-                    </span>
-                    {/* Общий доход от мастера */}
-                    <span className="font-bold text-zinc-100 text-right">
-                      {masterRevenue.toLocaleString()}
-                    </span>
-                    {/* Зарплата (20%) */}
-                    <span className="font-black text-[#c5a059] text-right">
-                      {masterSalary.toLocaleString()}
+                    <span className="bg-black/40 text-[11px] px-2 py-0.5 rounded text-zinc-400 font-bold uppercase">
+                      {masterApps.length} виз.
                     </span>
                   </div>
                   
-                  {/* Прогресс-бар визуализирует долю в общем доходе */}
-                  <div className="w-full bg-white/[0.03] h-[2px] rounded-full overflow-hidden">
+                  {/* Цифры в ряд */}
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex flex-col">
+                      <span className="text-[11px] text-zinc-500 uppercase font-black">Выручка</span>
+                      <span className="text-[13px] font-bold text-zinc-200">{masterRevenue.toLocaleString()} ₸</span>
+                    </div>
+                    <div className="flex flex-col text-right">
+                      <span className="text-[11px] text-zinc-500 uppercase font-black">К выплате (20%)</span>
+                      <span className="text-[13px] font-black text-[#d4af37]">{masterSalary.toLocaleString()} ₸</span>
+                    </div>
+                  </div>
+                  
+                  {/* Прогресс-бар */}
+                  <div className="w-full bg-white/[0.05] h-[3px] rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-[#c5a059] opacity-60 transition-all duration-700" 
+                      className="h-full bg-[#c5a059] transition-all duration-700 shadow-[0_0_5px_rgba(197,160,89,0.5)]" 
                       style={{ width: stats.revenue > 0 ? `${(masterRevenue / stats.revenue) * 100}%` : '0%' }}
                     ></div>
                   </div>
@@ -358,13 +372,13 @@ function EfficiencyCard({ stats, masters, appointments }) {
           </div>
           
           <div className="flex justify-between items-center bg-white/[0.02] p-2 rounded-lg">
-            <span className="text-zinc-500 text-[9px] uppercase font-black tracking-tighter">В кассу заведения (80%):</span>
+            <span className="text-zinc-500 text-[9px] uppercase font-black tracking-tighter">В кассу (80%):</span>
             <span className="text-emerald-400 font-black text-sm">+{ (stats.revenue * (1 - MASTER_PERCENT)).toLocaleString() } ₸</span>
           </div>
           
           <div className="flex justify-between items-center pt-2 px-2">
             <span className="text-white text-[10px] uppercase font-black">Общий оборот:</span>
-            <span className="text-[#c5a059] text-xl font-black italic">{ stats.revenue.toLocaleString() } ₸</span>
+            <span className="text-[#c5a059] text-xl font-black italic tracking-tighter">{ stats.revenue.toLocaleString() } ₸</span>
           </div>
         </div>
       </div>
