@@ -16,30 +16,55 @@ class AppointmentController extends Controller
     }
 public function storeAdmin(Request $request)
 {
+    // 1. Валидация входных данных
     $validated = $request->validate([
-        'client_name'   => 'required|string|max:255',
-        'client_phone'  => 'required|string|max:20',
-        'master_id'     => 'required|exists:masters,id',
-        'service_id'    => 'required|exists:services,id',
-        'date_time'     => 'required|date', // ⬅️ без after:now
+        'master_id' => 'required|exists:masters,id',
+        'service_id' => 'required|exists:services,id',
+        'client_name' => 'required|string|max:255',
+        'client_phone' => 'required|string',
+        'date' => 'required|date_format:Y-m-d',
+        'time' => 'required|date_format:H:i',
     ]);
 
-    $dateTime = Carbon::parse($validated['date_time'])->format('Y-m-d H:00');
+    // 2. Создаем чистую строку даты и времени (Y-m-d H:i:00)
+    // Это решит проблему несовместимости функций форматирования БД
+    $dateTime = Carbon::parse($validated['date'] . ' ' . $validated['time'])
+        ->format('Y-m-d H:i:s');
 
-    // Проверка занятости слота
+    // 3. Проверка: не занят ли мастер на это время?
+    // Используем обычный where, чтобы работало и в SQLite, и в MySQL
     $exists = Appointment::where('master_id', $validated['master_id'])
-        ->whereRaw("DATE_FORMAT(date_time, '%Y-%m-%d %H:00') = ?", [$dateTime])
+        ->where('date_time', $dateTime)
+        ->where('status', '!=', 'cancelled') // Отмененные записи не считаются занятыми
         ->exists();
 
     if ($exists) {
         return response()->json([
-            'message' => '❌ Этот слот уже занят. Выберите другое время.'
+            'message' => 'ВНИМАНИЕ: Данный временной слот уже занят этим мастером.'
         ], 422);
     }
 
-    $appointment = Appointment::create($validated);
+    // 4. Создание записи
+    try {
+        $appointment = Appointment::create([
+            'master_id' => $validated['master_id'],
+            'service_id' => $validated['service_id'],
+            'client_name' => $validated['client_name'],
+            'client_phone'  => (string)$validated['client_phone'], // Убедитесь, что это строка
+            'date_time' => $dateTime,
+            'status' => 'pending', // По умолчанию для админки
+        ]);
 
-    return response()->json($appointment, 201);
+        return response()->json([
+            'message' => 'Запись успешно создана',
+            'appointment' => $appointment->load(['master', 'service'])
+        ], 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Ошибка при сохранении: ' . $e->getMessage()
+        ], 500);
+    }
 }
 
     public function show($id)
@@ -55,10 +80,12 @@ public function storeAdmin(Request $request)
     }
 
     public function destroy($id)
-    {
-        Appointment::findOrFail($id)->delete();
-        return response()->json(['message' => 'Удалено']);
-    }
+{
+    $appointment = Appointment::findOrFail($id);
+    $appointment->delete();
+
+    return response()->json(['message' => 'Запись удалена']);
+}
 
     public function day($date)
 {

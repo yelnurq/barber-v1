@@ -1,378 +1,369 @@
-import { useState, useEffect } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import styles from "./AppointmentsAdmin.module.css";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import axiosInstance from "../../../api/axios";
 import AdminHeader from "../../../components/AdminHeader/AdminHeader";
 
-export default function AppointmentsAdmin() {
-  const [date, setDate] = useState(new Date());
-  const [appointments, setAppointments] = useState([]);
-  const [masters, setMasters] = useState([]);
-  const [services, setServices] = useState([]);
-  const [editing, setEditing] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    master_id: "",
-    date: "",
-    time: "",
-    client_name: "",
-    client_phone: "",
-    service_id: "",
-  });
+// Константы вынесены за пределы компонента
+const MASTER_PERCENT = 0.2;
+const HOURS = Array.from({ length: 13 }, (_, i) => i + 9);
 
-  const hours = Array.from({ length: 12 }, (_, i) => i + 9);
-
-  const statuses = [
-    { value: "booked", label: "📌 Забронировано", color: "#facc15" },
-    { value: "confirmed", label: "✅ Завершено", color: "#22c55e" },
-    { value: "cancelled", label: "❌ Отменено", color: "#ef4444" },
-  ];
-
-  const formatDate = (d) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getDate()
-    ).padStart(2, "0")}`;
-
-  useEffect(() => {
-    fetchMasters();
-    fetchServices();
-  }, []);
-
-  useEffect(() => {
-    fetchAppointments(date);
-  }, [date]);
-
-  const fetchMasters = async () => {
-    try {
-      const res = await axiosInstance.get("/masters");
-      setMasters(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchServices = async () => {
-    try {
-      const res = await axiosInstance.get("/services");
-      setServices(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchAppointments = async (d) => {
-    setLoading(true);
-    try {
-      const res = await axiosInstance.get(`/admin/schedule/${formatDate(d)}`);
-      setAppointments(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getAppointment = (masterId, hour) =>
-    appointments.find(
-      (a) => a.master_id === masterId && new Date(a.date_time).getHours() === hour
-    );
-
-  const createAppointment = async () => {
-    try {
-      await axiosInstance.post("/admin/appointments", {
-        ...form,
-        date_time: `${form.date} ${form.time}:00`,
-      });
-      setModalOpen(false);
-      fetchAppointments(date);
-    } catch (err) {
-      console.error(err.response?.data?.errors || err);
-    }
-  };
-
-  const updateStatus = async (app, newStatus) => {
-    try {
-      await axiosInstance.put(`/appointments/${app.id}`, { status: newStatus });
-      setAppointments((prev) =>
-        prev.map((a) => (a.id === app.id ? { ...a, status: newStatus } : a))
-      );
-      setEditing(null);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const deleteAppointment = async (app) => {
-  if (!window.confirm("Удалить запись?")) return;
-  try {
-    await axiosInstance.delete(`/appointments/${app.id}`);
-    setAppointments((prev) => prev.filter((a) => a.id !== app.id));
-  } catch (err) {
-    console.error(err);
-  }
+const STATUS_CONFIG = {
+  pending: { label: "ОЖИДАНИЕ", border: "border-amber-500/20", bg: "bg-amber-500/10" },
+  confirmed: { label: "ГОТОВО", border: "border-emerald-500/20", bg: "bg-emerald-500/10" },
+  cancelled: { label: "ОТМЕНА", border: "border-rose-500/20", bg: "bg-rose-500/10" },
 };
 
-const formatDateNumeric = (date) => {
-  const d = date.getDate().toString().padStart(2, "0");
-  const m = (date.getMonth() + 1).toString().padStart(2, "0");
-  const y = date.getFullYear();
-  return `${d}-${m}-${y}`;
-};
+// --- Мемоизированная ячейка таблицы ---
+const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, isEditing, updateStatus }) => {
+  const s = appointment ? (STATUS_CONFIG[appointment.status] || STATUS_CONFIG.pending) : null;
 
   return (
-    <>
-      <AdminHeader />
-      <div className={styles.wrapper}>
-        {/* Левая колонка: календарь + выручка */}
-        <div className={styles.leftColumn}>
-          <div className={styles.calendarBox}>
-            <Calendar value={date} onChange={setDate} />
+    <td 
+      className="p-3 border-r border-white/5 min-w-[240px] relative transition-colors hover:bg-white/[0.02]"
+      onClick={() => !appointment && onSlotClick(master, hour)}
+    >
+      {appointment ? (
+        <div className={`p-4 rounded-xl border ${s.border} ${s.bg} group relative`}>
+          <div className="flex justify-between items-start mb-3">
+            <button 
+              onClick={(e) => { e.stopPropagation(); onEditStatus(appointment.id); }} 
+              className="text-[9px] font-black px-2 py-1 rounded bg-black/40 text-white hover:bg-[#d4af37] transition-all"
+            >
+              {s.label}
+            </button>
+            <span className="text-xs font-bold text-[#d4af37]">{appointment.service?.price.toLocaleString()} ₸</span>
           </div>
-
-          {loading ? (
-            <div className={styles.skeletonRevenue}>
-              {masters.map((_, idx) => (
-                <div key={idx} className={styles.skeletonRevenueRow}>
-                  <div className={styles.skeletonCell}></div>
-                  <div className={styles.skeletonCell}></div>
-                  <div className={styles.skeletonCell}></div>
-                  <div className={styles.skeletonCell}></div>
-                  <div className={styles.skeletonCell}></div>
-                  <div className={styles.skeletonCell}></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.revenue}>
-              <div className={styles.revenueHeader}>
-                <h3>{formatDateNumeric(date)}</h3>
-                <button
-                  className={styles.refreshBtn}
-                  onClick={() => fetchAppointments(date)}
+          <div className="text-sm font-bold text-white uppercase tracking-tight truncate">{appointment.client_name}</div>
+          <div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">{appointment.service?.name}</div>
+          
+          {isEditing && (
+            <div className="absolute inset-0 z-20 bg-[#1c1c1f] rounded-xl p-2 flex flex-col gap-1 shadow-2xl ring-1 ring-[#d4af37]">
+              {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+                <button 
+                  key={key} 
+                  onClick={(e) => { e.stopPropagation(); updateStatus(appointment, key); }} 
+                  className="flex-1 text-[10px] font-black py-2 rounded hover:bg-[#d4af37] hover:text-black transition-colors uppercase"
                 >
-                  🔄 Обновить
+                  {cfg.label}
                 </button>
-              </div>
-              <table className={styles.revenueTable}>
-                <thead>
-                  <tr>
-                    <th>Сотрудник</th>
-                    <th>Общая</th>
-                    <th>Подтверждено</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {masters.map((m) => {
-                    const all = appointments
-                      .filter((a) => a.master_id === m.id)
-                      .reduce((sum, a) => sum + (a.service?.price || 0), 0);
-
-                    const confirmed = appointments
-                      .filter((a) => a.master_id === m.id && a.status === "confirmed")
-                      .reduce((sum, a) => sum + (a.service?.price || 0), 0);
-
-                    return (
-                      <tr key={m.id}>
-                        <td>{m.name}</td>
-                        <td>{all}₸</td>
-                        <td>{confirmed}₸</td>
-                      </tr>
-                    );
-                  })}
-                  <tr className={styles.totalRow}>
-                    <td>
-                      <b>Итого</b>
-                    </td>
-                    <td>
-                      <b>
-                        {appointments.reduce(
-                          (sum, a) => sum + (a.service?.price || 0),
-                          0
-                        )}
-                        ₸
-                      </b>
-                    </td>
-                    <td>
-                      <b>
-                        {appointments
-                          .filter((a) => a.status === "confirmed")
-                          .reduce((sum, a) => sum + (a.service?.price || 0), 0)}
-                        ₸
-                      </b>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              ))}
+              <button onClick={(e) => { e.stopPropagation(); onEditStatus(null); }} className="text-[9px] text-zinc-500 font-bold uppercase py-1">Отмена</button>
             </div>
           )}
         </div>
+      ) : (
+        <div className="h-16 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">+ Добавить</span>
+        </div>
+      )}
+    </td>
+  );
+});
 
-        {/* Правая колонка: расписание */}
-        <div className={styles.rightColumn}>
-          <div className={styles.scheduleWrapper}>
-            {loading ? (
-              <div className={styles.skeletonWrapper}>
-                {/* Заголовки */}
-                <div className={styles.skeletonHeader}>
-                  <div className={styles.skeletonCell}></div>
-                  {masters.map((_, idx) => (
-                    <div key={idx} className={styles.skeletonCell}></div>
-                  ))}
-                </div>
+// --- Мемоизированное модальное окно ---
+const AppointmentModal = memo(({ slot, date, services, onClose, onSubmit }) => {
+  const [form, setForm] = useState({ client_name: "", client_phone: "", service_id: "" });
 
-                {/* Строки расписания */}
-                {hours.map((_, idx) => (
-                  <div key={idx} className={styles.skeletonRow}>
-                    <div className={styles.skeletonCell}></div>
-                    {masters.map((_, i) => (
-                      <div key={i} className={styles.skeletonCell}></div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className={styles.schedule}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Время</th>
-                      {masters.map((m) => (
-                        <th key={m.id}>{m.name}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {hours.map((hour) => (
-                      <tr key={hour}>
-                        <td>{hour}:00</td>
-                        {masters.map((m) => {
-                          const app = getAppointment(m.id, hour);
-                          return (
-                            <td
-                              key={m.id}
-                              className={app ? styles.busyCard : styles.freeCard}
-                              onClick={() => {
-                                if (!app) {
-                                  setForm({
-                                    master_id: m.id,
-                                    date: formatDate(date),
-                                    time: `${hour.toString().padStart(2, "0")}:00`,
-                                    client_name: "",
-                                    client_phone: "",
-                                    service_id: "",
-                                  });
-                                  setModalOpen(true);
-                                }
-                              }}
-                            >
-                              {app ? (
-<div className={styles.appCard}>
-    {editing === app.id ? (
-    <select
-      autoFocus
-      value={app.status || "booked"}
-      onChange={(e) => updateStatus(app, e.target.value)}
-      onBlur={() => setEditing(null)}
-      className={styles.statusSelect}
-    >
-      {statuses.map((s) => (
-        <option key={s.value} value={s.value}>
-          {s.label}
-        </option>
-      ))}
-    </select>
-  ) : (
-    <div
-      className={styles.status}
-      style={{
-        background:
-          statuses.find((s) => s.value === app.status)?.color || "#9ca3af",
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        setEditing(app.id);
-      }}
-    >
-      {statuses.find((s) => s.value === app.status)?.label ||
-        "📌 Забронировано"}
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+      <div className="bg-[#111113] border border-white/10 w-full max-w-md rounded-[2rem] overflow-hidden shadow-2xl">
+        <div className="p-8 bg-white/[0.02] border-b border-white/5">
+          <h3 className="text-2xl font-black text-white uppercase italic">Новый визит</h3>
+          <p className="text-[#d4af37] font-bold text-xs mt-1 uppercase tracking-widest">{slot.time} • {slot.master_name}</p>
+        </div>
+        <div className="p-8 space-y-5">
+          <Input label="Клиент" value={form.client_name} onChange={v => setForm(f => ({...f, client_name: v}))} placeholder="Имя" />
+          <Input label="Телефон" value={form.client_phone} onChange={v => setForm(f => ({...f, client_phone: v}))} placeholder="+7 (___) ___" />
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black text-zinc-500 uppercase ml-1">Услуга</label>
+            <select className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-[#d4af37] outline-none" 
+              value={form.service_id} onChange={e => setForm(f => ({...f, service_id: e.target.value}))}>
+              <option value="" className="bg-[#111113]">Выбрать из прайса...</option>
+              {services.map(s => <option key={s.id} value={s.id} className="bg-[#111113]">{s.name} — {s.price}₸</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="p-8 pt-0 flex flex-col gap-3">
+          <button onClick={() => onSubmit(form)} className="w-full bg-[#d4af37] text-black font-black py-4 rounded-xl uppercase text-xs hover:brightness-110 active:scale-95 transition-all">Записать клиента</button>
+          <button onClick={onClose} className="w-full text-zinc-500 font-bold py-2 uppercase text-[10px] tracking-widest">Отмена</button>
+        </div>
+      </div>
     </div>
-  )}
-  <div className={styles.clientName}>{app.client_name}</div>
-  <div className={styles.serviceInfo}>
-    {app.service?.name} — {app.service?.price || 0}₸
+  );
+});
+
+// --- Основной компонент ---
+export default function AppointmentsAdmin() {
+  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [appointments, setAppointments] = useState([]);
+  const [masters, setMasters] = useState([]);
+  const [services, setServices] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [activeSlot, setActiveSlot] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Оптимизированная мапа записей
+  const appointmentsMap = useMemo(() => {
+    const map = {};
+    appointments.forEach(app => {
+      const h = new Date(app.date_time).getHours();
+      map[`${app.master_id}-${h}`] = app;
+    });
+    return map;
+  }, [appointments]);
+
+  // Статистика
+  const stats = useMemo(() => {
+    const confirmed = appointments.filter(a => a.status === "confirmed");
+    const totalRev = confirmed.reduce((s, a) => s + (a.service?.price || 0), 0);
+    const capacity = masters.length * HOURS.length;
+    const occupancy = capacity > 0 ? Math.round((appointments.filter(a => a.status !== "cancelled").length / capacity) * 100) : 0;
+    return { revenue: totalRev, profit: totalRev * (1 - MASTER_PERCENT), occupancy };
+  }, [appointments, masters]);
+
+  const fetchSchedule = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get(`/admin/schedule/${currentDate}`);
+      setAppointments(res.data);
+    } catch (err) { console.error(err); }
+    finally { setIsLoading(false); }
+  }, [currentDate]);
+
+  useEffect(() => {
+    const init = async () => {
+      const [m, s] = await Promise.all([axiosInstance.get("/masters"), axiosInstance.get("/services")]);
+      setMasters(m.data);
+      setServices(s.data);
+    };
+    init();
+  }, []);
+
+  useEffect(() => { fetchSchedule(); }, [fetchSchedule]);
+
+  const handleUpdateStatus = async (app, newStatus) => {
+    try {
+      await axiosInstance.put(`/appointments/${app.id}`, { status: newStatus });
+      setAppointments(prev => prev.map(a => a.id === app.id ? { ...a, status: newStatus } : a));
+      setEditingId(null);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleCreate = async (formData) => {
+    try {
+      await axiosInstance.post("/admin/appointments", { 
+        ...formData, 
+        master_id: activeSlot.master_id, 
+        date: currentDate, 
+        time: activeSlot.time, 
+        status: "pending" 
+      });
+      setActiveSlot(null);
+      fetchSchedule();
+    } catch (err) { alert("Ошибка сохранения"); }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#09090b] font-sans text-zinc-100 pb-20">
+      <AdminHeader />
+  <main className="max-w-[1600px] mx-auto p-4 lg:p-6"> {/* Уменьшил padding контейнера */}
+  
+  <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4"> {/* Уменьшил отступы */}
+    <div className="space-y-2">
+      <h1 className="text-3xl font-black uppercase italic text-white tracking-tighter">Журнал</h1>
+      <input 
+        type="date" 
+        value={currentDate} 
+        onChange={(e) => setCurrentDate(e.target.value)}
+        className="bg-[#111113] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#d4af37] font-bold outline-none focus:border-[#d4af37] transition-all"
+      />
+    </div>
+    <div className="flex gap-3">
+      <StatCardSmall title="Выручка" value={`${stats.revenue.toLocaleString()} ₸`} />
+      <StatCardSmall title="Прибыль" value={`${stats.profit.toLocaleString()} ₸`} color="text-[#d4af37]" />
+    </div>
   </div>
-  <div className={styles.phone}>
-    📞 <a href={`tel:${app.client_phone}`}>+{app.client_phone}</a>
+
+  <div className="flex flex-col xl:flex-row gap-6">
+    <div className="xl:w-72 flex-shrink-0 space-y-4"> {/* Сузил боковую панель */}
+      <EfficiencyCard stats={stats} masters={masters} appointments={appointments} />
+    </div>
+
+    <div className="flex-grow bg-[#111113] rounded-xl border border-white/5 shadow-2xl overflow-hidden relative">
+      {isLoading && (
+        <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center font-black text-[#d4af37] text-xs tracking-widest">
+          СИНХРОНИЗАЦИЯ...
+        </div>
+      )}
+      
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-[#18181b]">
+              {/* Уменьшил ширину колонки времени с w-24 до w-16 и padding */}
+              <th className="p-3 text-left text-[9px] font-black text-zinc-500 uppercase border-r border-white/5 w-16">
+                Время
+              </th>
+              {masters.map(m => (
+                <th key={m.id} className="p-3 text-xs font-black uppercase text-white border-r border-white/5 min-w-[180px]">
+                  {m.name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {HOURS.map(hour => (
+              <tr key={hour} className="border-t border-white/5">
+                {/* Уменьшил шрифт времени с xl до base и padding */}
+                <td className="p-3 text-base font-light text-zinc-600 bg-white/[0.01] border-r border-white/5 text-center">
+                  {hour}:00
+                </td>
+                {masters.map(m => (
+                  <TimeSlot 
+                    key={`${m.id}-${hour}`}
+                    hour={hour}
+                    master={m}
+                    appointment={appointmentsMap[`${m.id}-${hour}`]}
+                    onSlotClick={(master, h) => setActiveSlot({ master_id: master.id, master_name: master.name, time: `${h.toString().padStart(2, "0")}:00` })}
+                    onEditStatus={setEditingId}
+                    isEditing={editingId === appointmentsMap[`${m.id}-${hour}`]?.id}
+                    updateStatus={handleUpdateStatus}
+                  />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
+</main>
 
+      {activeSlot && (
+        <AppointmentModal 
+          slot={activeSlot} 
+          date={currentDate} 
+          services={services} 
+          onClose={() => setActiveSlot(null)} 
+          onSubmit={handleCreate} 
+        />
+      )}
+    </div>
+  );
+}
 
+// --- Вспомогательные компоненты (Финальная карточка эффективности) ---
+function EfficiencyCard({ stats, masters, appointments }) {
+  return (
+    <div className="bg-[#111113] rounded-2xl border border-white/5 overflow-hidden shadow-xl">
+      <div className="p-4 bg-white/5 border-b border-white/5">
+        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Эффективность смены</h3>
+      </div>
+      
+      <div className="p-5 space-y-6">
+        {/* Общий индикатор загрузки */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-end">
+            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-tight">Загрузка салона</span>
+            <span className="font-black text-white text-lg">{stats.occupancy}%</span>
+          </div>
+          <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#c5a059] transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(197,160,89,0.3)]" 
+              style={{ width: `${stats.occupancy}%` }}
+            ></div>
+          </div>
+        </div>
 
-  {/* 🗑 Кнопка удаления */}
-  <button
-    className={styles.deleteBtn}
-    onClick={(e) => {
-      e.stopPropagation();
-      deleteAppointment(app);
-    }}
-  >
-    🗑
-  </button>
-    {/* Статус */}
+        {/* Детализация по мастерам */}
+        <div className="pt-2">
+          {/* Шапка таблицы — 4 колонки: Имя, Кол-во, Принес (Грязными), ЗП (20%) */}
+          <div className="grid grid-cols-[1fr_40px_70px_70px] gap-2 mb-4 px-1">
+            <p className="text-[8px] text-zinc-500 uppercase font-black">Мастер</p>
+            <p className="text-[8px] text-zinc-500 uppercase font-black text-center">Визиты</p>
+            <p className="text-[8px] text-zinc-500 uppercase font-black text-right">Валовый</p>
+            <p className="text-[8px] text-zinc-500 uppercase font-black text-right">ЗП (20%)</p>
+          </div>
+          
+          <div className="space-y-5">
+            {masters.map(m => {
+              const masterApps = appointments.filter(a => a.master_id === m.id && a.status === "confirmed");
+              const masterRevenue = masterApps.reduce((s, a) => s + (a.service?.price || 0), 0);
+              const masterSalary = masterRevenue * MASTER_PERCENT;
 
-</div>
-
-                              ) : (
-                                <span>Свободно</span>
-                              )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+              return (
+                <div key={m.id} className="group">
+                  <div className="grid grid-cols-[1fr_40px_70px_70px] gap-2 items-center text-[13px] mb-2 px-1">
+                    {/* Имя */}
+                    <span className="text-zinc-300 font-bold group-hover:text-white transition-colors truncate uppercase">
+                      {m.name}
+                    </span>
+                    {/* Количество услуг */}
+                    <span className="font-bold text-zinc-500 text-center">
+                      {masterApps.length}
+                    </span>
+                    {/* Общий доход от мастера */}
+                    <span className="font-bold text-zinc-100 text-right">
+                      {masterRevenue.toLocaleString()}
+                    </span>
+                    {/* Зарплата (20%) */}
+                    <span className="font-black text-[#c5a059] text-right">
+                      {masterSalary.toLocaleString()}
+                    </span>
+                  </div>
+                  
+                  {/* Прогресс-бар визуализирует долю в общем доходе */}
+                  <div className="w-full bg-white/[0.03] h-[2px] rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-[#c5a059] opacity-60 transition-all duration-700" 
+                      style={{ width: stats.revenue > 0 ? `${(masterRevenue / stats.revenue) * 100}%` : '0%' }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Итоговый финансовый отчет */}
+        <div className="pt-5 border-t border-white/10 space-y-3">
+          <div className="flex justify-between items-center bg-white/[0.02] p-2 rounded-lg">
+            <span className="text-zinc-500 text-[9px] uppercase font-black tracking-tighter">На выплату (20%):</span>
+            <span className="text-rose-400 font-black text-sm">-{ (stats.revenue * MASTER_PERCENT).toLocaleString() } ₸</span>
+          </div>
+          
+          <div className="flex justify-between items-center bg-white/[0.02] p-2 rounded-lg">
+            <span className="text-zinc-500 text-[9px] uppercase font-black tracking-tighter">В кассу заведения (80%):</span>
+            <span className="text-emerald-400 font-black text-sm">+{ (stats.revenue * (1 - MASTER_PERCENT)).toLocaleString() } ₸</span>
+          </div>
+          
+          <div className="flex justify-between items-center pt-2 px-2">
+            <span className="text-white text-[10px] uppercase font-black">Общий оборот:</span>
+            <span className="text-[#c5a059] text-xl font-black italic">{ stats.revenue.toLocaleString() } ₸</span>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Модальное окно */}
-      {modalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>Новая запись</h3>
-            <input
-              type="text"
-              placeholder="Имя клиента"
-              value={form.client_name}
-              onChange={(e) => setForm({ ...form, client_name: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Телефон"
-              value={form.client_phone}
-              onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
-            />
-            <select
-              value={form.service_id}
-              onChange={(e) => setForm({ ...form, service_id: e.target.value })}
-            >
-              <option value="">Выберите услугу</option>
-              {services.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} — {s.price}₸
-                </option>
-              ))}
-            </select>
-            <div className={styles.modalActions}>
-              <button onClick={createAppointment}>Сохранить</button>
-              <button onClick={() => setModalOpen(false)}>Отмена</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+function StatCardSmall({ title, value, color = "text-white" }) {
+  return (
+    <div className="bg-[#111113] border border-white/5 px-6 py-3 rounded-xl min-w-[160px]">
+      <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{title}</p>
+      <p className={`text-xl font-black ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function Input({ label, value, onChange, placeholder, disabled }) {
+  return (
+    <div className="space-y-1.5 text-left">
+      <label className="text-[10px] font-black text-zinc-500 uppercase ml-1">{label}</label>
+      <input 
+        disabled={disabled}
+        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-[#d4af37] outline-none transition-all placeholder:text-zinc-700" 
+        placeholder={placeholder} value={value} onChange={e => onChange?.(e.target.value)}
+      />
+    </div>
   );
 }

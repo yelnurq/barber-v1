@@ -26,12 +26,13 @@ Route::middleware(TokenCheck::class)->group(function () {
     Route::get('/admin/appointments/{id}', [\App\Http\Controllers\Admin\AppointmentController::class, 'show']);
     Route::put('/admin/appointments/{id}', [App\Http\Controllers\Admin\AppointmentController::class, 'update']);
     Route::get('/admin/schedule/{date}', [AdminAppointmentController::class, 'day']);
-Route::post('/admin/appointments', [AdminAppointmentController::class, 'storeAdmin']);
-Route::get('/admin/statistics/{date}', [AdminAppointmentController::class, 'daily']);
-Route::get('/admin/statistics', [AdminAppointmentController::class, 'period']); // ?start=2025-09-01&end=2025-09-09
-Route::get('/admin/statistics-total', [AdminAppointmentController::class, 'total']);
+    Route::post('/admin/appointments', [AdminAppointmentController::class, 'storeAdmin']);
+    Route::get('/admin/statistics/{date}', [AdminAppointmentController::class, 'daily']);
+    Route::get('/admin/statistics', [AdminAppointmentController::class, 'period']); // ?start=2025-09-01&end=2025-09-09
+    Route::get('/admin/statistics-total', [AdminAppointmentController::class, 'total']);
+    Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy']);
 
-Route::delete('/admin/appointments/{id}', [\App\Http\Controllers\Admin\AppointmentController::class, 'destroy']);
+    Route::delete('/admin/appointments/{id}', [AdminAppointmentController::class, 'destroy']);
 });
 
 Route::get('/admin/statistics-summary', [AdminAppointmentController::class, 'summary']);
