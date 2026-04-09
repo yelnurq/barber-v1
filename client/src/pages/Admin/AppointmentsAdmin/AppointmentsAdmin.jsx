@@ -12,47 +12,61 @@ const STATUS_CONFIG = {
   cancelled: { label: "ОТМЕНА", border: "border-rose-500/20", bg: "bg-rose-500/10" },
 };
 
-// --- Мемоизированная ячейка таблицы ---
-const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, isEditing, updateStatus }) => {
+const TimeSlot = memo(({ hour, master, appointment, onSlotClick, onEditStatus, isEditing, updateStatus, onDelete }) => {
   const s = appointment ? (STATUS_CONFIG[appointment.status] || STATUS_CONFIG.pending) : null;
 
   return (
     <td 
-      className="p-3 border-r border-white/5 min-w-[240px] relative transition-colors hover:bg-white/[0.02]"
+      className="p-1 border-r border-white/5 min-w-[140px] relative transition-colors hover:bg-white/[0.02]" // Уменьшил p и min-w
       onClick={() => !appointment && onSlotClick(master, hour)}
     >
       {appointment ? (
-        <div className={`p-4 rounded-xl border ${s.border} ${s.bg} group relative`}>
-          <div className="flex justify-between items-start mb-3">
+        <div className={`p-2 rounded-lg border ${s.border} ${s.bg} group relative transition-all`}> {/* p-3 -> p-2 */}
+          
+          <button 
+            onClick={(e) => onDelete(e, appointment.id)}
+            className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10 shadow-lg hover:bg-rose-500"
+          >
+            <span className="text-[10px]">×</span>
+          </button>
+
+          <div className="flex justify-between items-start mb-1">
             <button 
               onClick={(e) => { e.stopPropagation(); onEditStatus(appointment.id); }} 
-              className="text-[9px] font-black px-2 py-1 rounded bg-black/40 text-white hover:bg-[#d4af37] transition-all"
+              className="text-[7px] font-black px-1 py-0.5 rounded bg-black/40 text-white hover:bg-[#d4af37]"
             >
               {s.label}
             </button>
-            <span className="text-xs font-bold text-[#d4af37]">{appointment.service?.price.toLocaleString()} ₸</span>
+            <span className="text-[9px] font-bold text-[#d4af37] leading-none">
+              {appointment.service?.price.toLocaleString()}
+            </span>
           </div>
-          <div className="text-sm font-bold text-white uppercase tracking-tight truncate">{appointment.client_name}</div>
-          <div className="text-[10px] text-zinc-400 font-bold uppercase mt-1">{appointment.service?.name}</div>
           
+          <div className="text-[10px] font-bold text-white uppercase truncate leading-tight">
+            {appointment.client_name}
+          </div>
+          <div className="text-[8px] text-zinc-500 font-bold uppercase truncate">
+            {appointment.service?.name}
+          </div>
+          
+          {/* Меню статусов — тоже чуть меньше */}
           {isEditing && (
-            <div className="absolute inset-0 z-20 bg-[#1c1c1f] rounded-xl p-2 flex flex-col gap-1 shadow-2xl ring-1 ring-[#d4af37]">
+            <div className="absolute inset-0 z-20 bg-[#1c1c1f] rounded-lg p-1 flex flex-col gap-0.5 shadow-2xl ring-1 ring-[#d4af37]">
               {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
                 <button 
                   key={key} 
                   onClick={(e) => { e.stopPropagation(); updateStatus(appointment, key); }} 
-                  className="flex-1 text-[10px] font-black py-2 rounded hover:bg-[#d4af37] hover:text-black transition-colors uppercase"
+                  className="flex-1 text-[8px] font-black rounded hover:bg-[#d4af37] hover:text-black transition-colors uppercase"
                 >
                   {cfg.label}
                 </button>
               ))}
-              <button onClick={(e) => { e.stopPropagation(); onEditStatus(null); }} className="text-[9px] text-zinc-500 font-bold uppercase py-1">Отмена</button>
             </div>
           )}
         </div>
       ) : (
-        <div className="h-16 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
-          <span className="text-[10px] font-black text-zinc-700 uppercase tracking-widest">+ Добавить</span>
+        <div className="h-8 flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer">
+          <span className="text-[9px] text-zinc-800">+</span>
         </div>
       )}
     </td>
@@ -147,7 +161,18 @@ export default function AppointmentsAdmin() {
       setEditingId(null);
     } catch (err) { console.error(err); }
   };
+const handleDelete = async (e, appointmentId) => {
+  e.stopPropagation(); // Чтобы не открылось окно редактирования/создания
+  if (!window.confirm("Удалить эту запись?")) return;
 
+  try {
+    await axiosInstance.delete(`/appointments/${appointmentId}`);
+    setAppointments(prev => prev.filter(a => a.id !== appointmentId));
+  } catch (err) {
+    console.error("Ошибка при удалении:", err);
+    alert("Не удалось удалить запись");
+  }
+};
   const handleCreate = async (formData) => {
     try {
       await axiosInstance.post("/admin/appointments", { 
@@ -183,8 +208,8 @@ export default function AppointmentsAdmin() {
     </div>
   </div>
 
-  <div className="flex flex-col xl:flex-row gap-6">
-    <div className="xl:w-72 flex-shrink-0 space-y-4"> {/* Сузил боковую панель */}
+  <div className="flex flex-col xl:flex-row gap-4">
+    <div className="xl:w-64 flex-shrink-0 space-y-4"> {/* Сузил боковую панель */}
       <EfficiencyCard stats={stats} masters={masters} appointments={appointments} />
     </div>
 
@@ -196,7 +221,7 @@ export default function AppointmentsAdmin() {
       )}
       
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse table-fixed">
           <thead>
             <tr className="bg-[#18181b]">
               {/* Уменьшил ширину колонки времени с w-24 до w-16 и padding */}
@@ -219,15 +244,16 @@ export default function AppointmentsAdmin() {
                 </td>
                 {masters.map(m => (
                   <TimeSlot 
-                    key={`${m.id}-${hour}`}
-                    hour={hour}
-                    master={m}
-                    appointment={appointmentsMap[`${m.id}-${hour}`]}
-                    onSlotClick={(master, h) => setActiveSlot({ master_id: master.id, master_name: master.name, time: `${h.toString().padStart(2, "0")}:00` })}
-                    onEditStatus={setEditingId}
-                    isEditing={editingId === appointmentsMap[`${m.id}-${hour}`]?.id}
-                    updateStatus={handleUpdateStatus}
-                  />
+                      key={`${m.id}-${hour}`}
+                      hour={hour}
+                      master={m}
+                      appointment={appointmentsMap[`${m.id}-${hour}`]}
+                      onSlotClick={(master, h) => setActiveSlot({ master_id: master.id, master_name: master.name, time: `${h.toString().padStart(2, "0")}:00` })}
+                      onEditStatus={setEditingId}
+                      isEditing={editingId === appointmentsMap[`${m.id}-${hour}`]?.id}
+                      updateStatus={handleUpdateStatus}
+                      onDelete={handleDelete} // <-- Добавь это
+                    />
                 ))}
               </tr>
             ))}
