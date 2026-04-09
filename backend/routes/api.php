@@ -35,6 +35,4 @@ Route::middleware(TokenCheck::class)->group(function () {
     Route::delete('/admin/appointments/{id}', [AdminAppointmentController::class, 'destroy']);
 });
 
-Route::get('/admin/statistics-summary', [AdminAppointmentController::class, 'summary']);
-Route::get('/admin/clients', [AdminAppointmentController::class, 'clientBase']);
 

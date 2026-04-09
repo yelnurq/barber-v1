@@ -5,30 +5,34 @@ const axiosInstance = axios.create({
   // baseURL: 'https://lumina.kz/',
 });
 
-// Добавляем access token (если есть)
+// Добавляем токен в каждый запрос
 axiosInstance.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    config.__tokenKey = 'token'; // для обработки 401
   }
-
   return config;
 });
 
-// Обработка 401 ошибок
+// Централизованная обработка ошибок сервера
 axiosInstance.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401 && error.config?.__tokenKey) {
+  (response) => response,
+  (error) => {
+    // Если сервер вернул 401 (токен протух или его нет)
+    if (error.response && error.response.status === 401) {
+      
+      // 1. Очищаем невалидный токен из памяти
       localStorage.removeItem('token');
 
-      const redirectTo = '/';
-
-      if (window.location.pathname !== redirectTo) {
-        alert('Сессия истекла. Пожалуйста, войдите заново.');
-        window.location.href = redirectTo;
+      // 2. Проверяем, не находимся ли мы уже на странице логина, чтобы не зациклить редирект
+      const loginPage = '/login';
+      if (window.location.pathname !== loginPage) {
+        // Можно убрать alert, если хочешь бесшовный вылет, 
+        // но для админки лучше оставить уведомление
+        alert('Сессия истекла или недостаточно прав. Войдите заново.');
+        
+        // 3. Кидаем на логин
+        window.location.href = loginPage;
       }
     }
 

@@ -1,24 +1,36 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/LoginPage/LoginPage";
-import { useState } from "react";
 import Home from "./pages/Home/Home";
 import AppointmentsAdmin from "./pages/Admin/AppointmentsAdmin/AppointmentsAdmin";
 import EmployeesAdmin from "./pages/Admin/EmployeesAdmin/EmployeesAdmin";
-import StatisticsAdmin from "./pages/Admin/StatisticsAdmin/StatisticsAdmin";
-import Clients from "./pages/Admin/Clients/Clients";
+import ProtectedRoute from "./components/ProtectedRoute"; // Импортируем обертку
 
 function App() {
-
-
   return (
     <BrowserRouter>
       <Routes>
+        {/* Публичные роуты */}
         <Route path='/login' element={<Login/>} />
         <Route path='/' element={<Home/>} />
-        <Route path='/admin' element={<AppointmentsAdmin/>} />
-        <Route path='/admin/employees' element={<EmployeesAdmin/>} />
-        <Route path='/admin/statistics' element={<StatisticsAdmin/>} />
-        <Route path='/admin/clients' element={<Clients/>} />
+
+        {/* Защищенные роуты */}
+        <Route 
+          path='/admin' 
+          element={
+            <ProtectedRoute>
+              <AppointmentsAdmin/>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/admin/employees' 
+          element={
+            <ProtectedRoute>
+              <EmployeesAdmin/>
+            </ProtectedRoute>
+          } 
+        />
+
       </Routes>
     </BrowserRouter>
   );
