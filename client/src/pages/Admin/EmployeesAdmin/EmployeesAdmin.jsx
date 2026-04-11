@@ -188,7 +188,6 @@ export default function EmployeesAdmin() {
   );
 }
 
-// Вспомогательный компонент для полей ввода
 function Field({ label, value, onChange, placeholder }) {
   return (
     <div className="space-y-1.5">
