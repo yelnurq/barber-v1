@@ -127,8 +127,6 @@ const handleLogout = async () => {
           </button>
         </div>
       </header>
-
-      {/* Отступ под хедер */}
       <div className="h-16 md:h-20"></div>
     </>
   );
