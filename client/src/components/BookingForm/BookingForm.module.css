@@ -191,10 +191,8 @@
   margin-bottom: 15px;
   padding: 0 !important;
 }
-/* Прошедшие даты (отключенные) */
 .calendarContainer :global(.react-calendar__tile:disabled) {
   background-color: transparent !important;
-  /* Красим текст в тускло-серый */
   color: #444 !important; 
   cursor: not-allowed !important;
 }
