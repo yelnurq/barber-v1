@@ -157,7 +157,6 @@ export default function EmployeesAdmin() {
           )}
         </main>
 
-        {/* Modal - Адаптирован под мобилки (items-end на мобилках) */}
         {modalOpen && (
           <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={closeModal}></div>
