@@ -216,7 +216,6 @@
   text-decoration: none !important;
   cursor: default;
 }
-/* Кнопки дат */
 .calendarContainer :global(.react-calendar__tile) {
   color: white !important;
   background: none;
