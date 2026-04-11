@@ -197,12 +197,10 @@
   cursor: not-allowed !important;
 }
 
-/* Убираем эффект ховера для прошедших дат */
 .calendarContainer :global(.react-calendar__tile:disabled:enabled:hover) {
   background-color: transparent !important;
 }
 
-/* Если нужно сделать их еще менее заметными (полупрозрачными) */
 .calendarContainer :global(.react-calendar__month-view__days__day--past),
 .calendarContainer :global(.react-calendar__tile:disabled) {
   opacity: 0.4;
