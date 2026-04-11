@@ -86,7 +86,6 @@ export default function EmployeesAdmin() {
           ) : (
             <div className="bg-[#111113] rounded-[2rem] md:rounded-3xl border border-white/5 overflow-hidden shadow-2xl">
               
-              {/* Десктопная версия (Таблица) - скрыта на мобилках */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
