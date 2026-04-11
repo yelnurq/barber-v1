@@ -212,7 +212,6 @@
   padding: 5px 0 !important;
 }
 
-/* Убираем стандартное подчеркивание у тега abbr внутри дней */
 .calendarContainer :global(.react-calendar__month-view__weekdays__weekday abbr) {
   text-decoration: none !important;
   cursor: default;
