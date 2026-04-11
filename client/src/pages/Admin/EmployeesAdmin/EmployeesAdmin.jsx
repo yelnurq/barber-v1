@@ -126,7 +126,6 @@ export default function EmployeesAdmin() {
                 </table>
               </div>
 
-              {/* Мобильная версия (Карточки) - скрыта на десктопах */}
               <div className="md:hidden divide-y divide-white/5">
                 {masters.map((m) => (
                   <div key={m.id} className="p-5 flex justify-between items-center">
