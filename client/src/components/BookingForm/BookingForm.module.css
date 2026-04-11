@@ -230,7 +230,6 @@
   font-weight: 900;
 }
 
-/* Сегодняшняя дата (делаем просто золотую рамку или текст) */
 .calendarContainer :global(.react-calendar__tile--now) {
   background: rgba(212, 175, 55, 0.1) !important;
   color: #d4af37 !important;
