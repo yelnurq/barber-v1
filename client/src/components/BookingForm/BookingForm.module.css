@@ -205,7 +205,6 @@
 .calendarContainer :global(.react-calendar__tile:disabled) {
   opacity: 0.4;
 }
-/* Принудительно центрируем каждый отдельный день */
 .calendarContainer :global(.react-calendar__month-view__weekdays__weekday) {
   display: flex !important;
   justify-content: center !important;
