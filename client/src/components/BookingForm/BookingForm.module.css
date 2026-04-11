@@ -224,7 +224,6 @@
   font-size: 14px;
 }
 
-/* Активная (выбранная) дата */
 .calendarContainer :global(.react-calendar__tile--active) {
   background: #d4af37 !important; /* Золотой фон */
   color: #000 !important; /* Черные цифры на золотом фоне */
