@@ -25,7 +25,6 @@ axiosInstance.interceptors.response.use(
 
       const loginPage = '/login';
       if (window.location.pathname !== loginPage) {
-        // Можно убрать alert, если хочешь бесшовный вылет, 
         // но для админки лучше оставить уведомление
         alert('Сессия истекла или недостаточно прав. Войдите заново.');
         
