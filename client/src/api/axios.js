@@ -29,7 +29,6 @@ axiosInstance.interceptors.response.use(
         // но для админки лучше оставить уведомление
         alert('Сессия истекла или недостаточно прав. Войдите заново.');
         
-        // 3. Кидаем на логин
         window.location.href = loginPage;
       }
     }
