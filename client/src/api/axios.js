@@ -23,7 +23,6 @@ axiosInstance.interceptors.response.use(
       // 1. Очищаем невалидный токен из памяти
       localStorage.removeItem('token');
 
-      // 2. Проверяем, не находимся ли мы уже на странице логина, чтобы не зациклить редирект
       const loginPage = '/login';
       if (window.location.pathname !== loginPage) {
         // Можно убрать alert, если хочешь бесшовный вылет, 
