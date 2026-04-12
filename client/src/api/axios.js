@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   // baseURL: 'https://lumina.kz/',
 });
 
-// Добавляем токен в каждый запрос
 axiosInstance.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
