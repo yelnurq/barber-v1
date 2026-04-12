@@ -17,7 +17,6 @@ axiosInstance.interceptors.request.use(config => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Если сервер вернул 401 (токен протух или его нет)
     if (error.response && error.response.status === 401) {
       
       localStorage.removeItem('token');
