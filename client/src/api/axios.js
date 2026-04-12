@@ -14,7 +14,6 @@ axiosInstance.interceptors.request.use(config => {
   return config;
 });
 
-// Централизованная обработка ошибок сервера
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
