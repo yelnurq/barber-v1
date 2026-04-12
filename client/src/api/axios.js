@@ -18,7 +18,6 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-
       const loginPage = '/login';
       if (window.location.pathname !== loginPage) {
         alert('Сессия истекла или недостаточно прав. Войдите заново.');
