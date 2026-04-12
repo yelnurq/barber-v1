@@ -20,7 +20,6 @@ axiosInstance.interceptors.response.use(
     // Если сервер вернул 401 (токен протух или его нет)
     if (error.response && error.response.status === 401) {
       
-      // 1. Очищаем невалидный токен из памяти
       localStorage.removeItem('token');
 
       const loginPage = '/login';
